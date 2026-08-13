@@ -4,6 +4,221 @@ const QRCode = require("qrcode");
 const QR = require("../Model/QRModel");
 const Campaign = require("../Model/CampaignModel");
 const Quiz = require("../Model/QuizModel");
+const mongoose = require("mongoose");
+
+// =====================================================
+// get All QR
+// =====================================================
+
+const getAllQr = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, status, search } = req.query;
+
+    const pageNumber = Math.max(Number(page) || 1, 1);
+    const limitNumber = Math.max(Number(limit) || 10, 1);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    // ==========================================
+    // FILTER
+    // ==========================================
+
+    const filter = {};
+
+    if (status && status !== "all") {
+      filter.status = status;
+    }
+
+    // ==========================================
+    // SEARCH
+    // ==========================================
+
+    if (search?.trim()) {
+      const doctors = await QR.find()
+        .populate({
+          path: "doctor",
+          match: {
+            name: {
+              $regex: search.trim(),
+              $options: "i",
+            },
+          },
+          select: "_id",
+        })
+        .select("doctor");
+
+      const doctorIds = doctors
+        .filter((item) => item.doctor)
+        .map((item) => item.doctor._id);
+
+      filter.$or = [
+        {
+          shortCode: {
+            $regex: search.trim(),
+            $options: "i",
+          },
+        },
+        {
+          doctor: {
+            $in: doctorIds,
+          },
+        },
+      ];
+    }
+
+    // ==========================================
+    // TOTAL
+    // ==========================================
+
+    const total = await QR.countDocuments(filter);
+
+    // ==========================================
+    // GET QR DATA
+    // ==========================================
+
+    const qrs = await QR.find(filter)
+      .populate("doctor", "name doctorId")
+      .populate("campaign", "name")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNumber)
+      .lean();
+
+    // ==========================================
+    // QR SCAN ANALYTICS
+    // ==========================================
+
+    const qrIds = qrs.map((qr) => qr._id);
+
+    const scanStats = await QRScan.aggregate([
+      {
+        $match: {
+          qr: {
+            $in: qrIds,
+          },
+        },
+      },
+
+      {
+        $group: {
+          _id: "$qr",
+
+          // Total scans
+          totalScans: {
+            $sum: 1,
+          },
+
+          // Unique session IDs
+          uniqueSessions: {
+            $addToSet: "$sessionId",
+          },
+
+          // Last scan
+          lastScanned: {
+            $max: "$scannedAt",
+          },
+        },
+      },
+    ]);
+
+    // ==========================================
+    // MAP SCAN STATS
+    // ==========================================
+
+    const statsMap = new Map();
+
+    scanStats.forEach((item) => {
+      const uniqueSessions = item.uniqueSessions.filter(
+        (session) => session !== null && session !== undefined,
+      );
+
+      statsMap.set(item._id.toString(), {
+        totalScans: item.totalScans,
+        uniqueScans: uniqueSessions.length,
+        lastScanned: item.lastScanned,
+      });
+    });
+
+    // ==========================================
+    // FINAL DATA
+    // ==========================================
+
+    const data = qrs.map((qr) => {
+      const stats = statsMap.get(qr._id.toString()) || {
+        totalScans: 0,
+        uniqueScans: 0,
+        lastScanned: null,
+      };
+
+      const baseUrl = process.env.QR_BASE_URL || "http://192.168.1.37:2468";
+
+      return {
+        id: qr._id,
+
+        // QR
+        qrCodeSvg: qr.qrCodeSvg,
+
+        // Doctor
+        doctor: qr.doctor
+          ? {
+              id: qr.doctor._id,
+              name: qr.doctor.name,
+              doctorId: qr.doctor.doctorId,
+            }
+          : null,
+
+        // Campaign
+        campaign: qr.campaign
+          ? {
+              id: qr.campaign._id,
+              name: qr.campaign.name,
+            }
+          : null,
+
+        // URLs
+        shortCode: qr.shortCode,
+        shortUrl: `${baseUrl}/q/${qr.shortCode}`,
+        destinationUrl: qr.destinationUrl,
+
+        // Status
+        status: qr.status,
+
+        // Analytics
+        totalScans: stats.totalScans,
+        uniqueScans: stats.uniqueScans,
+        lastScanned: stats.lastScanned,
+
+        // Date
+        createdAt: qr.createdAt,
+      };
+    });
+
+    // ==========================================
+    // RESPONSE
+    // ==========================================
+
+    return res.status(200).json({
+      success: true,
+
+      pagination: {
+        total,
+        page: pageNumber,
+        limit: limitNumber,
+        pages: Math.ceil(total / limitNumber),
+      },
+
+      data,
+    });
+  } catch (error) {
+    console.error("Get All QR Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch QR codes.",
+      error: error.message,
+    });
+  }
+};
+
 
 // =====================================================
 // CREATE QR
@@ -15,8 +230,6 @@ const createQr = async (req, res) => {
     // STEP 01 - REQUEST RECEIVED
     // ============================================================
 
-
-
     const { doctorId, campaignId, quizId = null } = req.body;
 
     // ============================================================
@@ -24,38 +237,30 @@ const createQr = async (req, res) => {
     // ============================================================
 
     if (!doctorId || !campaignId) {
-    
-
       return res.status(400).json({
         success: false,
         message: "Doctor ID and Campaign ID are required.",
       });
     }
 
-
     // ============================================================
     // STEP 03 - FIND DOCTOR
     // ============================================================
-
 
     const doctor = await Doctor.findOne({
       doctorId: doctorId,
     });
 
-
     if (!doctor) {
-
       return res.status(404).json({
         success: false,
         message: "Invalid Doctor ID.",
       });
     }
 
-
     // ============================================================
     // STEP 04 - FIND CAMPAIGN
     // ============================================================
-
 
     let campaign = null;
 
@@ -63,12 +268,8 @@ const createQr = async (req, res) => {
     // Try MongoDB _id
     // ------------------------------------------------------------
 
-    const mongoose = require("mongoose");
-
     if (mongoose.Types.ObjectId.isValid(campaignId)) {
-
       campaign = await Campaign.findById(campaignId);
-
     }
 
     // ------------------------------------------------------------
@@ -76,57 +277,45 @@ const createQr = async (req, res) => {
     // ------------------------------------------------------------
 
     if (!campaign) {
-
       campaign = await Campaign.findOne({
         campaignId: campaignId,
       });
-
     }
 
     if (!campaign) {
-
       return res.status(404).json({
         success: false,
         message: "Invalid Campaign ID.",
       });
     }
 
-
     // ============================================================
     // STEP 05 - FIND QUIZ
     // ============================================================
 
-
     let quiz = null;
 
     if (quizId) {
-
       if (mongoose.Types.ObjectId.isValid(quizId)) {
         console.log("Trying Quiz.findById()...");
 
         quiz = await Quiz.findById(quizId);
-
       }
 
       if (!quiz) {
-
         quiz = await Quiz.findOne({
           quizId: quizId,
         });
-
       }
 
       if (!quiz) {
-
         return res.status(404).json({
           success: false,
           message: "Invalid Quiz ID.",
         });
       }
-
     } else {
     }
-
 
     // ============================================================
     // STEP 06 - GENERATE SHORT CODE
@@ -142,17 +331,14 @@ const createQr = async (req, res) => {
 
       shortCode = Math.random().toString(36).substring(2, 9).toUpperCase();
 
-
       existingQr = await QR.findOne({
         shortCode,
       });
-
 
       if (attempts > 20) {
         throw new Error("Could not generate unique short code.");
       }
     } while (existingQr);
-
 
     // ============================================================
     // STEP 07 - CHECK MONGO CONNECTION
@@ -168,10 +354,8 @@ const createQr = async (req, res) => {
     */
 
     if (mongoose.connection.readyState !== 1) {
-
       throw new Error("MongoDB is not connected.");
     }
-
 
     // ============================================================
     // STEP 08 - CREATE QR URL
@@ -179,16 +363,13 @@ const createQr = async (req, res) => {
 
     const baseUrl = process.env.QR_BASE_URL || "http://192.168.1.37:2468";
 
-
     const qrUrl = `${baseUrl}/q/${shortCode}`;
-
 
     // ============================================================
     // STEP 09 - GENERATE QR DATA URL
     // ============================================================
 
     const qrCode = await QRCode.toDataURL(qrUrl);
-
 
     // ============================================================
     // STEP 10 - GENERATE QR SVG
@@ -203,11 +384,9 @@ const createQr = async (req, res) => {
       },
     });
 
-
     // ============================================================
     // STEP 11 - PREPARE DATABASE OBJECT
     // ============================================================
-
 
     const qrData = {
       doctor: doctor._id,
@@ -231,11 +410,9 @@ const createQr = async (req, res) => {
       expiresAt: null,
     };
 
-
     // ============================================================
     // STEP 12 - SAVE TO MONGODB
     // ============================================================
-
 
     const qr = await QR.create(qrData);
 
@@ -243,22 +420,17 @@ const createQr = async (req, res) => {
     // STEP 13 - VERIFY FROM DATABASE
     // ============================================================
 
-
     const savedQr = await QR.findById(qr._id).lean();
 
-
     if (!savedQr) {
-
       throw new Error(
         "QR was created but could not be found immediately after creation.",
       );
     }
 
-
     // ============================================================
     // STEP 14 - RESPONSE
     // ============================================================
-
 
     return res.status(201).json({
       success: true,
@@ -298,13 +470,11 @@ const createQr = async (req, res) => {
     // ERROR
     // ============================================================
 
-
     console.error("Error Name:", error.name);
 
     console.error("Error Message:", error.message);
 
     console.error("Full Error:", error);
-
 
     return res.status(500).json({
       success: false,
@@ -313,6 +483,11 @@ const createQr = async (req, res) => {
     });
   }
 };
+
+// =====================================================
+// get QR DASHBOARD
+// =====================================================
+
 const getQRDashboard = async (req, res) => {
   try {
     // ==========================================
@@ -546,5 +721,6 @@ const getQRScansOverTime = async (req, res) => {
 module.exports = {
   getQRDashboard,
   getQRScansOverTime,
-  createQr
+  createQr,
+  getAllQr,
 };

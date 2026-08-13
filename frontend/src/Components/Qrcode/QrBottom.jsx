@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Search,
   Download,
@@ -16,104 +16,126 @@ import {
   QrCode,
 } from "lucide-react";
 
-const qrData = [
-  {
-    id: 1,
-    doctor: "Dr. Manohar Lele - Mumbai",
-    doctorName: "Dr. Manohar Lele",
-    shortUrl: "/q/8F32kL",
-    destination: "/dr-manohar-lele-mumbai",
-    status: "Active",
-    scans: "2,345",
-    uniqueScans: "1,876",
-    lastScanned: "2 mins ago",
-    location: "Mumbai, MH",
-  },
-  {
-    id: 2,
-    doctor: "Dr. Priya Shah - Pune",
-    doctorName: "Dr. Priya Shah",
-    shortUrl: "/q/b7G56mN",
-    destination: "/dr-priya-shah-pune",
-    status: "Active",
-    scans: "1,987",
-    uniqueScans: "1,543",
-    lastScanned: "10 mins ago",
-    location: "Pune, MH",
-  },
-  {
-    id: 3,
-    doctor: "Dr. Amit Verma - Nagpur",
-    doctorName: "Dr. Amit Verma",
-    shortUrl: "/q/c9H78pQ",
-    destination: "/dr-amit-verma-nagpur",
-    status: "Active",
-    scans: "1,456",
-    uniqueScans: "1,102",
-    lastScanned: "15 mins ago",
-    location: "Nagpur, MH",
-  },
-  {
-    id: 4,
-    doctor: "Dr. Neha Iyer - Bangalore",
-    doctorName: "Dr. Neha Iyer",
-    shortUrl: "/q/d3K91sT",
-    destination: "/dr-neha-iyer-bangalore",
-    status: "Active",
-    scans: "1,234",
-    uniqueScans: "987",
-    lastScanned: "20 mins ago",
-    location: "Bengaluru, KA",
-  },
-  {
-    id: 5,
-    doctor: "Dr. Rajesh Gupta - Delhi",
-    doctorName: "Dr. Rajesh Gupta",
-    shortUrl: "/q/e5L23wV",
-    destination: "/dr-rajesh-gupta-delhi",
-    status: "Paused",
-    scans: "987",
-    uniqueScans: "832",
-    lastScanned: "1 hour ago",
-    location: "Delhi, DL",
-  },
-];
+function QRCodeTable({
+  data = [],
+  loading = false,
 
-function QRCodeTable() {
+  page = 1,
+  pages = 1,
+  total = 0,
+  limit = 10,
+
+  onPageChange,
+  onLimitChange,
+}) {
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
 
-  const filteredData = qrData.filter(
-    (item) =>
-      item.doctor.toLowerCase().includes(search.toLowerCase()) ||
-      item.doctorName.toLowerCase().includes(search.toLowerCase())
-  );
+  // ==========================================
+  // SEARCH CURRENT API DATA
+  // ==========================================
+
+  const filteredData = useMemo(() => {
+    if (!search.trim()) {
+      return data;
+    }
+
+    const searchValue = search.toLowerCase().trim();
+
+    return data.filter((item) => {
+      const doctorName = item.doctor?.name || "";
+
+      const shortUrl = item.shortUrl || "";
+
+      const shortCode = item.shortCode || "";
+
+      return (
+        doctorName.toLowerCase().includes(searchValue) ||
+        shortUrl.toLowerCase().includes(searchValue) ||
+        shortCode.toLowerCase().includes(searchValue)
+      );
+    });
+  }, [data, search]);
+
+  // ==========================================
+  // COPY URL
+  // ==========================================
 
   const copyUrl = (url) => {
+    if (!url) return;
+
     navigator.clipboard.writeText(url);
   };
 
-  return (
-    <div className=" bg-[#f8f9fc] p-3">
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_220px]">
+  // ==========================================
+  // FORMAT DATE
+  // ==========================================
 
+  const formatDate = (date) => {
+    if (!date) {
+      return "Never";
+    }
+
+    const scannedDate = new Date(date);
+
+    if (Number.isNaN(scannedDate.getTime())) {
+      return "Never";
+    }
+
+    return scannedDate.toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // ==========================================
+  // FORMAT NUMBER
+  // ==========================================
+
+  const formatNumber = (number) => {
+    return Number(number || 0).toLocaleString("en-IN");
+  };
+
+  // ==========================================
+  // PAGINATION CALCULATIONS
+  // ==========================================
+
+  const startEntry = total === 0 ? 0 : (page - 1) * limit + 1;
+
+  const endEntry = Math.min(page * limit, total);
+
+  // ==========================================
+  // LOADING
+  // ==========================================
+
+  if (loading) {
+    return (
+      <div className="bg-[#f8f9fc] p-3">
+        <div className="rounded-lg border border-gray-200 bg-white p-10 text-center">
+          <p className="text-[11px] text-gray-400">Loading QR codes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-[#f8f9fc] p-3">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_220px]">
         {/* =====================================================
             MAIN TABLE
         ====================================================== */}
 
         <div className="min-w-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-
           {/* ================= TABLE HEADER ================= */}
 
           <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3">
-
-            {/* Title */}
-
             <h2 className="shrink-0 text-[14px] font-semibold text-[#17203a]">
               All QR Codes
             </h2>
 
-            {/* Search */}
+            {/* SEARCH */}
 
             <div className="relative max-w-[240px] flex-1">
               <Search
@@ -130,8 +152,17 @@ function QRCodeTable() {
               <input
                 type="text"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by doctor name, QR name..."
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  setSearch(value);
+
+                  // Reset server pagination to page 1
+                  if (onPageChange) {
+                    onPageChange(1);
+                  }
+                }}
+                placeholder="Search by doctor name, QR..."
                 className="
                   h-[30px]
                   w-full
@@ -150,10 +181,9 @@ function QRCodeTable() {
               />
             </div>
 
-            {/* Header Actions */}
+            {/* HEADER ACTIONS */}
 
             <div className="flex shrink-0 items-center gap-2">
-
               <button
                 className="
                   flex
@@ -197,24 +227,19 @@ function QRCodeTable() {
                 <Download size={13} />
                 Download All QR (ZIP)
               </button>
-
             </div>
           </div>
-
 
           {/* ================= TABLE ================= */}
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[850px] border-collapse">
-
               {/* ================= TABLE HEAD ================= */}
 
               <thead>
                 <tr className="border-b border-gray-100 bg-[#fafbfc]">
-
                   <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-gray-600">
-                    QR Name
-                    <span className="ml-1 text-gray-400">⌄</span>
+                    QR
                   </th>
 
                   <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-gray-600">
@@ -248,311 +273,308 @@ function QRCodeTable() {
                   <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-gray-600">
                     Actions
                   </th>
-
                 </tr>
               </thead>
-
 
               {/* ================= TABLE BODY ================= */}
 
               <tbody>
-                {filteredData.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="
-                      border-b
-                      border-gray-100
-                      transition
-                      hover:bg-gray-50/70
-                    "
-                  >
+                {filteredData.map((item) => {
+                  const doctorName = item.doctor?.name || "Unknown Doctor";
 
-                    {/* QR Name */}
+                  const status = item.status || "inactive";
 
-                    <td className="px-3 py-2.5">
-                      <div className="flex items-center gap-2">
+                  return (
+                    <tr
+                      key={item.id}
+                      className="
+                        border-b
+                        border-gray-100
+                        transition
+                        hover:bg-gray-50/70
+                      "
+                    >
+                      {/* QR */}
 
-                        <div
-                          className="
-                            flex
-                            h-[32px]
-                            w-[32px]
-                            shrink-0
-                            items-center
-                            justify-center
-                            rounded
-                            border
-                            border-gray-200
-                            bg-white
-                          "
-                        >
-                          <QrCode
-                            size={24}
-                            strokeWidth={1.5}
-                            className="text-gray-800"
-                          />
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="
+                              flex
+                              h-[40px]
+                              w-[40px]
+                              shrink-0
+                              items-center
+                              justify-center
+                              overflow-hidden
+                              rounded
+                              border
+                              border-gray-200
+                              bg-white
+                            "
+                          >
+                            {item.qrCodeSvg ? (
+                              <div
+                                className="h-[34px] w-[34px]"
+                                dangerouslySetInnerHTML={{
+                                  __html: item.qrCodeSvg,
+                                }}
+                              />
+                            ) : (
+                              <span className="text-[8px] text-gray-400">
+                                QR
+                              </span>
+                            )}
+                          </div>
                         </div>
+                      </td>
 
-                        <span className="whitespace-nowrap text-[10px] font-medium text-gray-700">
-                          {item.doctor}
+                      {/* DOCTOR */}
+
+                      <td className="px-3 py-2.5">
+                        <span className="whitespace-nowrap text-[10px] font-medium text-gray-600">
+                          {doctorName}
                         </span>
+                      </td>
 
-                      </div>
-                    </td>
+                      {/* SHORT URL */}
 
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center gap-1">
+                          <span className="whitespace-nowrap text-[10px] font-medium text-indigo-500">
+                            {item.shortUrl || "-"}
+                          </span>
 
-                    {/* Doctor */}
+                          {item.shortUrl && (
+                            <button
+                              onClick={() => copyUrl(item.shortUrl)}
+                              className="text-gray-400 transition hover:text-indigo-500"
+                              title="Copy"
+                            >
+                              <Copy size={11} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
 
-                    <td className="px-3 py-2.5">
-                      <span className="whitespace-nowrap text-[10px] text-gray-600">
-                        {item.doctorName}
-                      </span>
-                    </td>
+                      {/* DESTINATION URL */}
 
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center gap-1">
+                          <span className="max-w-[160px] truncate text-[10px] font-medium text-indigo-500">
+                            {item.destinationUrl || "-"}
+                          </span>
 
-                    {/* Short URL */}
+                          {item.destinationUrl && (
+                            <ExternalLink
+                              size={11}
+                              className="shrink-0 text-gray-400"
+                            />
+                          )}
+                        </div>
+                      </td>
 
-                    <td className="px-3 py-2.5">
-                      <div className="flex items-center gap-1">
+                      {/* STATUS */}
 
-                        <span className="whitespace-nowrap text-[10px] font-medium text-indigo-500">
-                          {item.shortUrl}
+                      <td className="px-3 py-2.5">
+                        {status === "active" ? (
+                          <span
+                            className="
+                              inline-flex
+                              rounded-md
+                              border
+                              border-green-200
+                              bg-green-50
+                              px-2
+                              py-1
+                              text-[9px]
+                              font-medium
+                              text-green-600
+                            "
+                          >
+                            Active
+                          </span>
+                        ) : status === "expired" ? (
+                          <span
+                            className="
+                              inline-flex
+                              rounded-md
+                              border
+                              border-red-200
+                              bg-red-50
+                              px-2
+                              py-1
+                              text-[9px]
+                              font-medium
+                              text-red-500
+                            "
+                          >
+                            Expired
+                          </span>
+                        ) : (
+                          <span
+                            className="
+                              inline-flex
+                              rounded-md
+                              border
+                              border-orange-200
+                              bg-orange-50
+                              px-2
+                              py-1
+                              text-[9px]
+                              font-medium
+                              text-orange-500
+                            "
+                          >
+                            Inactive
+                          </span>
+                        )}
+                      </td>
+
+                      {/* TOTAL SCANS */}
+
+                      <td className="px-3 py-2.5">
+                        <span className="text-[10px] font-medium text-gray-700">
+                          {formatNumber(item.totalScans)}
                         </span>
+                      </td>
 
-                        <button
-                          onClick={() => copyUrl(item.shortUrl)}
-                          className="text-gray-400 transition hover:text-indigo-500"
-                          title="Copy"
-                        >
-                          <Copy size={11} />
-                        </button>
+                      {/* UNIQUE SCANS */}
 
-                      </div>
-                    </td>
-
-
-                    {/* Destination URL */}
-
-                    <td className="px-3 py-2.5">
-                      <div className="flex items-center gap-1">
-
-                        <span className="whitespace-nowrap text-[10px] font-medium text-indigo-500">
-                          {item.destination}
+                      <td className="px-3 py-2.5">
+                        <span className="text-[10px] font-medium text-gray-700">
+                          {formatNumber(item.uniqueScans)}
                         </span>
+                      </td>
 
-                        <ExternalLink
-                          size={11}
-                          className="shrink-0 text-gray-400"
-                        />
+                      {/* LAST SCANNED */}
 
-                      </div>
-                    </td>
+                      <td className="px-3 py-2.5">
+                        <div className="whitespace-nowrap">
+                          <p className="text-[10px] font-medium text-gray-700">
+                            {formatDate(item.lastScanned)}
+                          </p>
+                        </div>
+                      </td>
 
+                      {/* ACTIONS */}
 
-                    {/* Status */}
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center gap-1">
+                          {/* VIEW */}
 
-                    <td className="px-3 py-2.5">
+                          <button
+                            className="
+                              flex
+                              h-[23px]
+                              w-[23px]
+                              items-center
+                              justify-center
+                              rounded
+                              border
+                              border-indigo-200
+                              bg-indigo-50
+                              text-indigo-500
+                              transition
+                              hover:bg-indigo-100
+                            "
+                            title="View"
+                          >
+                            <Eye size={12} />
+                          </button>
 
-                      {item.status === "Active" ? (
-                        <span
-                          className="
-                            inline-flex
-                            rounded-md
-                            border
-                            border-green-200
-                            bg-green-50
-                            px-2
-                            py-1
-                            text-[9px]
-                            font-medium
-                            text-green-600
-                          "
-                        >
-                          Active
-                        </span>
-                      ) : (
-                        <span
-                          className="
-                            inline-flex
-                            rounded-md
-                            border
-                            border-orange-200
-                            bg-orange-50
-                            px-2
-                            py-1
-                            text-[9px]
-                            font-medium
-                            text-orange-500
-                          "
-                        >
-                          Paused
-                        </span>
-                      )}
+                          {/* EDIT */}
 
-                    </td>
+                          <button
+                            className="
+                              flex
+                              h-[23px]
+                              w-[23px]
+                              items-center
+                              justify-center
+                              rounded
+                              border
+                              border-blue-200
+                              bg-blue-50
+                              text-blue-500
+                              transition
+                              hover:bg-blue-100
+                            "
+                            title="Edit"
+                          >
+                            <Pencil size={12} />
+                          </button>
 
+                          {/* REGENERATE */}
 
-                    {/* Total Scans */}
+                          <button
+                            className="
+                              flex
+                              h-[23px]
+                              w-[23px]
+                              items-center
+                              justify-center
+                              rounded
+                              border
+                              border-orange-200
+                              bg-orange-50
+                              text-orange-500
+                              transition
+                              hover:bg-orange-100
+                            "
+                            title="Regenerate"
+                          >
+                            <RefreshCcw size={12} />
+                          </button>
 
-                    <td className="px-3 py-2.5">
-                      <span className="text-[10px] font-medium text-gray-700">
-                        {item.scans}
-                      </span>
-                    </td>
+                          {/* PAUSE */}
 
+                          <button
+                            className="
+                              flex
+                              h-[23px]
+                              w-[23px]
+                              items-center
+                              justify-center
+                              rounded
+                              border
+                              border-orange-200
+                              bg-orange-50
+                              text-orange-500
+                              transition
+                              hover:bg-orange-100
+                            "
+                            title="Pause"
+                          >
+                            <Pause size={12} />
+                          </button>
 
-                    {/* Unique Scans */}
+                          {/* MORE */}
 
-                    <td className="px-3 py-2.5">
-                      <span className="text-[10px] font-medium text-gray-700">
-                        {item.uniqueScans}
-                      </span>
-                    </td>
+                          <button
+                            className="
+                              flex
+                              h-[23px]
+                              w-[23px]
+                              items-center
+                              justify-center
+                              rounded
+                              text-gray-400
+                              transition
+                              hover:bg-gray-100
+                              hover:text-gray-600
+                            "
+                            title="More"
+                          >
+                            <MoreVertical size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
 
-
-                    {/* Last Scanned */}
-
-                    <td className="px-3 py-2.5">
-                      <div className="whitespace-nowrap">
-
-                        <p className="text-[10px] font-medium text-gray-700">
-                          {item.lastScanned}
-                        </p>
-
-                        <p className="mt-0.5 text-[9px] text-gray-400">
-                          {item.location}
-                        </p>
-
-                      </div>
-                    </td>
-
-
-                    {/* Actions */}
-
-                    <td className="px-3 py-2.5">
-
-                      <div className="flex items-center gap-1">
-
-                        {/* View */}
-
-                        <button
-                          className="
-                            flex
-                            h-[23px]
-                            w-[23px]
-                            items-center
-                            justify-center
-                            rounded
-                            border
-                            border-indigo-200
-                            bg-indigo-50
-                            text-indigo-500
-                            transition
-                            hover:bg-indigo-100
-                          "
-                          title="View"
-                        >
-                          <Eye size={12} />
-                        </button>
-
-
-                        {/* Edit */}
-
-                        <button
-                          className="
-                            flex
-                            h-[23px]
-                            w-[23px]
-                            items-center
-                            justify-center
-                            rounded
-                            border
-                            border-blue-200
-                            bg-blue-50
-                            text-blue-500
-                            transition
-                            hover:bg-blue-100
-                          "
-                          title="Edit"
-                        >
-                          <Pencil size={12} />
-                        </button>
-
-
-                        {/* Regenerate */}
-
-                        <button
-                          className="
-                            flex
-                            h-[23px]
-                            w-[23px]
-                            items-center
-                            justify-center
-                            rounded
-                            border
-                            border-orange-200
-                            bg-orange-50
-                            text-orange-500
-                            transition
-                            hover:bg-orange-100
-                          "
-                          title="Regenerate"
-                        >
-                          <RefreshCcw size={12} />
-                        </button>
-
-
-                        {/* Pause */}
-
-                        <button
-                          className="
-                            flex
-                            h-[23px]
-                            w-[23px]
-                            items-center
-                            justify-center
-                            rounded
-                            border
-                            border-orange-200
-                            bg-orange-50
-                            text-orange-500
-                            transition
-                            hover:bg-orange-100
-                          "
-                          title="Pause"
-                        >
-                          <Pause size={12} />
-                        </button>
-
-
-                        {/* More */}
-
-                        <button
-                          className="
-                            flex
-                            h-[23px]
-                            w-[23px]
-                            items-center
-                            justify-center
-                            rounded
-                            text-gray-400
-                            transition
-                            hover:bg-gray-100
-                            hover:text-gray-600
-                          "
-                        >
-                          <MoreVertical size={14} />
-                        </button>
-
-                      </div>
-
-                    </td>
-
-                  </tr>
-                ))}
-
-
-                {/* Empty State */}
+                {/* EMPTY STATE */}
 
                 {filteredData.length === 0 && (
                   <tr>
@@ -564,150 +586,71 @@ function QRCodeTable() {
                     </td>
                   </tr>
                 )}
-
               </tbody>
-
             </table>
           </div>
 
-
           {/* ================= PAGINATION ================= */}
 
-          <div className="flex items-center justify-between border-t border-gray-100 px-3 py-2.5">
-
-            {/* Left */}
-
-            <div className="flex items-center gap-3">
-
-              <span className="text-[10px] text-gray-500">
-                Showing 1 to 10 of 256 entries
+          <div className="flex items-center justify-between border-t border-gray-100 px-5 py-4">
+            {/* LEFT SIDE */}
+            <div className="text-sm text-gray-500">
+              Showing{" "}
+              <span className="font-medium text-gray-700">
+                {total === 0 ? 0 : (page - 1) * limit + 1}
               </span>
-
-              <select
-                className="
-                  h-[28px]
-                  rounded-md
-                  border
-                  border-gray-200
-                  bg-white
-                  px-2
-                  text-[10px]
-                  text-gray-600
-                  outline-none
-                  focus:border-purple-400
-                "
-              >
-                <option>10 per page</option>
-                <option>20 per page</option>
-                <option>50 per page</option>
-              </select>
-
+              {" - "}
+              <span className="font-medium text-gray-700">
+                {Math.min(page * limit, total)}
+              </span>
+              {" of "}
+              <span className="font-medium text-gray-700">{total}</span>
             </div>
 
-
-            {/* Right */}
-
+            {/* RIGHT SIDE */}
             <div className="flex items-center gap-1">
-
+              {/* PREVIOUS */}
               <button
-                className="
-                  flex
-                  h-[28px]
-                  w-[28px]
-                  items-center
-                  justify-center
-                  text-gray-400
-                  transition
-                  hover:bg-gray-50
-                "
+                type="button"
+                disabled={page <= 1 || loading}
+                onClick={() => {
+                  if (page > 1 && !loading) {
+                    onPageChange(page - 1);
+                  }
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                <ChevronLeft size={14} />
+                &lt;
               </button>
 
+              {/* CURRENT PAGE */}
+              <div className="flex h-8 min-w-8 items-center justify-center rounded-md bg-black px-2 text-sm font-medium text-white">
+                {page}
+              </div>
 
-              {[1, 2, 3].map((number) => (
-                <button
-                  key={number}
-                  onClick={() => setPage(number)}
-                  className={`
-                    flex
-                    h-[28px]
-                    w-[28px]
-                    items-center
-                    justify-center
-                    rounded-md
-                    border
-                    text-[10px]
-                    font-medium
-                    transition
-                    ${
-                      page === number
-                        ? "border-purple-200 bg-purple-50 text-purple-600"
-                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                    }
-                  `}
-                >
-                  {number}
-                </button>
-              ))}
-
-
-              <span className="px-1 text-[10px] text-gray-400">
-                ...
-              </span>
-
-
+              {/* NEXT */}
               <button
-                onClick={() => setPage(26)}
-                className="
-                  flex
-                  h-[28px]
-                  w-[28px]
-                  items-center
-                  justify-center
-                  rounded-md
-                  border
-                  border-gray-200
-                  text-[10px]
-                  font-medium
-                  text-gray-600
-                  transition
-                  hover:bg-gray-50
-                "
+                type="button"
+                disabled={page >= pages || loading}
+                onClick={() => {
+                  if (page < pages && !loading) {
+                    onPageChange(page + 1);
+                  }
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                26
+                &gt;
               </button>
-
-
-              <button
-                className="
-                  flex
-                  h-[28px]
-                  w-[28px]
-                  items-center
-                  justify-center
-                  text-gray-400
-                  transition
-                  hover:bg-gray-50
-                "
-              >
-                <ChevronRight size={14} />
-              </button>
-
             </div>
-
           </div>
-
         </div>
-
 
         {/* =====================================================
             RIGHT SIDEBAR
         ====================================================== */}
 
         <div className="flex flex-col gap-3">
-
-          {/* ================= QUICK ACTIONS ================= */}
+          {/* QUICK ACTIONS */}
 
           <div
             className="
@@ -719,18 +662,12 @@ function QRCodeTable() {
               shadow-[0_2px_8px_rgba(0,0,0,0.03)]
             "
           >
-
             <h2 className="text-[13px] font-semibold text-[#17203a]">
               Quick Actions
             </h2>
 
-
             <div className="mt-3 space-y-3">
-
-              {/* Generate QR */}
-
               <button className="flex w-full items-center gap-2 text-left">
-
                 <div
                   className="
                     flex
@@ -748,7 +685,6 @@ function QRCodeTable() {
                 </div>
 
                 <div>
-
                   <p className="text-[10px] font-semibold text-gray-700">
                     Generate QR Code
                   </p>
@@ -756,16 +692,10 @@ function QRCodeTable() {
                   <p className="mt-0.5 text-[9px] text-gray-400">
                     Create QR for a specific doctor
                   </p>
-
                 </div>
-
               </button>
 
-
-              {/* Bulk Generate */}
-
               <button className="flex w-full items-center gap-2 text-left">
-
                 <div
                   className="
                     flex
@@ -783,7 +713,6 @@ function QRCodeTable() {
                 </div>
 
                 <div>
-
                   <p className="text-[10px] font-semibold text-gray-700">
                     Bulk Generate QR
                   </p>
@@ -791,16 +720,10 @@ function QRCodeTable() {
                   <p className="mt-0.5 text-[9px] text-gray-400">
                     Generate QR for multiple doctors
                   </p>
-
                 </div>
-
               </button>
 
-
-              {/* Download */}
-
               <button className="flex w-full items-center gap-2 text-left">
-
                 <div
                   className="
                     flex
@@ -818,7 +741,6 @@ function QRCodeTable() {
                 </div>
 
                 <div>
-
                   <p className="text-[10px] font-semibold text-gray-700">
                     Download All QR
                   </p>
@@ -826,16 +748,10 @@ function QRCodeTable() {
                   <p className="mt-0.5 text-[9px] text-gray-400">
                     Download all QR codes as ZIP
                   </p>
-
                 </div>
-
               </button>
 
-
-              {/* Report */}
-
               <button className="flex w-full items-center gap-2 text-left">
-
                 <div
                   className="
                     flex
@@ -853,7 +769,6 @@ function QRCodeTable() {
                 </div>
 
                 <div>
-
                   <p className="text-[10px] font-semibold text-gray-700">
                     QR Scan Report
                   </p>
@@ -861,17 +776,12 @@ function QRCodeTable() {
                   <p className="mt-0.5 text-[9px] text-gray-400">
                     View detailed scan analytics
                   </p>
-
                 </div>
-
               </button>
-
             </div>
-
           </div>
 
-
-          {/* ================= QR HELP ================= */}
+          {/* QR HELP */}
 
           <div
             className="
@@ -883,7 +793,6 @@ function QRCodeTable() {
               shadow-[0_2px_8px_rgba(0,0,0,0.03)]
             "
           >
-
             <h2 className="text-[13px] font-semibold text-[#17203a]">
               QR Help
             </h2>
@@ -909,11 +818,15 @@ function QRCodeTable() {
               Learn more
               <ChevronRight size={12} />
             </button>
-
+            {console.log("PAGINATION:", {
+              page,
+              pages,
+              total,
+              limit,
+              loading,
+            })}
           </div>
-
         </div>
-
       </div>
     </div>
   );

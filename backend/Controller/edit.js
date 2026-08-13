@@ -98,7 +98,7 @@ exports.doActionOnQr = async (req, res) => {
             ipAddress: deviceInfo.ipAddress,
         })
 
-        await Qrscan.create({
+        await Qrscan.create({//dsadasd
             doctor: doctor._id,
             campaign: doctor.campaign,
             city: deviceInfo.city,

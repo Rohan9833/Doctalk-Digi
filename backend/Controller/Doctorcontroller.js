@@ -514,7 +514,7 @@ const getDoctorPage = async (req, res) => {
     const ip =
       req.headers["x-forwarded-for"] || req.socket?.remoteAddress || null;
 
-    await QRScan.create({
+    await QRScan.create({ //dsaasdad
       doctor: doctor._id,
       campaign: doctor.campaign._id,
       deviceType: detectDevice(ua),

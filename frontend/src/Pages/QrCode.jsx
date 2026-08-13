@@ -1,9 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import QrDashboard from "../Components/Qrcode/QrDashboard";
 import QrGraph from "../Components/Qrcode/QrAnalytics.jsx";
@@ -20,6 +15,19 @@ function Qrcode() {
   const [loading, setLoading] = useState(true);
 
   // ==========================================
+  // QR LIST DATA
+  // ==========================================
+
+  const [qrList, setQrList] = useState([]);
+  const [qrListLoading, setQrListLoading] = useState(true);
+
+  // SERVER PAGINATION
+  const [qrPage, setQrPage] = useState(1);
+  const [qrLimit, setQrLimit] = useState(10);
+  const [qrTotal, setQrTotal] = useState(0);
+  const [qrPages, setQrPages] = useState(1);
+
+  // ==========================================
   // DOCTORS & CAMPAIGNS
   // ==========================================
 
@@ -27,45 +35,31 @@ function Qrcode() {
   const [exportDoctors, setExportDoctors] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
 
-  const [doctorsLoading, setDoctorsLoading] =
-    useState(false);
-
-  const [campaignsLoading, setCampaignsLoading] =
-    useState(true);
+  const [doctorsLoading, setDoctorsLoading] = useState(false);
+  const [campaignsLoading, setCampaignsLoading] = useState(true);
 
   // ==========================================
   // QR GRAPH DATA
   // ==========================================
 
-  const [qrGraphData, setQrGraphData] =
-    useState([]);
-
-  const [graphLoading, setGraphLoading] =
-    useState(true);
-
-  const [graphRange, setGraphRange] =
-    useState("7d");
+  const [qrGraphData, setQrGraphData] = useState([]);
+  const [graphLoading, setGraphLoading] = useState(true);
+  const [graphRange, setGraphRange] = useState("7d");
 
   // ==========================================
   // PIE CHART DATA
   // ==========================================
 
-  const [topCities, setTopCities] =
-    useState([]);
-
-  const [totalScans, setTotalScans] =
-    useState(0);
-
-  const [locationLoading, setLocationLoading] =
-    useState(true);
+  const [topCities, setTopCities] = useState([]);
+  const [totalScans, setTotalScans] = useState(0);
+  const [locationLoading, setLocationLoading] = useState(true);
 
   // ==========================================
   // AUTH CONFIG
   // ==========================================
 
   const authConfig = useMemo(() => {
-    const token =
-      localStorage.getItem("adminToken");
+    const token = localStorage.getItem("adminToken");
 
     return {
       headers: {
@@ -83,20 +77,14 @@ function Qrcode() {
 
     const fetchQRDashboard = async () => {
       try {
-        console.log(
-          "Fetching QR Dashboard...",
-        );
+        setLoading(true);
 
-        const response = await axios.get(
-          "/api/qrcode/dashboard",
-          authConfig,
-        );
+        console.log("Fetching QR Dashboard...");
+
+        const response = await axios.get("/api/qrcode/dashboard", authConfig);
 
         if (!cancelled) {
-          console.log(
-            "QR Dashboard Response:",
-            response.data,
-          );
+          console.log("QR Dashboard Response:", response.data);
 
           setQrData(response.data);
         }
@@ -105,8 +93,7 @@ function Qrcode() {
           console.error(
             "QR Dashboard Error:",
             error.response?.status,
-            error.response?.data ||
-              error.message,
+            error.response?.data || error.message,
           );
         }
       } finally {
@@ -124,6 +111,109 @@ function Qrcode() {
   }, [authConfig]);
 
   // ==========================================
+  // GET PAGINATED QR LIST
+  // ==========================================
+
+  const fetchQrList = useCallback(
+    async (page, limit) => {
+      try {
+        setQrListLoading(true);
+
+        console.log(`Fetching QR List: page=${page}, limit=${limit}`);
+
+        const response = await axios.get(
+          `/api/qrcode?page=${page}&limit=${limit}`,
+          authConfig,
+        );
+
+        console.log("QR List Response:", response.data);
+
+        const responseData = response.data;
+
+        // ==============================
+        // QR DATA
+        // ==============================
+
+        setQrList(responseData.data || []);
+
+        // ==============================
+        // PAGINATION
+        // ==============================
+
+        const pagination = responseData.pagination || {};
+
+        setQrTotal(Number(pagination.total) || 0);
+
+        setQrPage(Number(pagination.page) || page);
+
+        setQrLimit(Number(pagination.limit) || limit);
+
+        setQrPages(Number(pagination.pages) || 1);
+      } catch (error) {
+        console.error(
+          "QR List Error:",
+          error.response?.status,
+          error.response?.data || error.message,
+        );
+
+        setQrList([]);
+        setQrTotal(0);
+        setQrPages(1);
+      } finally {
+        setQrListLoading(false);
+      }
+    },
+    [authConfig],
+  );
+
+  // ==========================================
+  // INITIAL QR LIST
+  // ==========================================
+
+  useEffect(() => {
+    fetchQrList(1, 10);
+  }, [fetchQrList]);
+
+  // ==========================================
+  // CHANGE QR PAGE
+  // ==========================================
+
+  const handleQrPageChange = useCallback(
+    (newPage) => {
+      const page = Number(newPage);
+
+      if (page < 1 || page > qrPages) {
+        return;
+      }
+
+      setQrPage(page);
+
+      fetchQrList(page, qrLimit);
+    },
+    [qrPages, qrLimit, fetchQrList],
+  );
+
+  // ==========================================
+  // CHANGE QR LIMIT
+  // ==========================================
+
+  const handleQrLimitChange = useCallback(
+    (newLimit) => {
+      const limit = Number(newLimit);
+
+      if (!limit || limit < 1) {
+        return;
+      }
+
+      setQrLimit(limit);
+      setQrPage(1);
+
+      fetchQrList(1, limit);
+    },
+    [fetchQrList],
+  );
+
+  // ==========================================
   // GET PAGINATED DOCTORS
   // ==========================================
 
@@ -132,24 +222,20 @@ function Qrcode() {
       try {
         setDoctorsLoading(true);
 
+        const trimmedSearch = search.trim();
+
         console.log(
           "Fetching Doctors:",
-          search.trim()
-            ? `Search = ${search.trim()}`
-            : "Initial 10 doctors",
+          trimmedSearch ? `Search = ${trimmedSearch}` : "Initial 10 doctors",
         );
 
-        const params =
-          new URLSearchParams();
+        const params = new URLSearchParams();
 
         params.append("page", "1");
         params.append("limit", "10");
 
-        if (search.trim()) {
-          params.append(
-            "search",
-            search.trim(),
-          );
+        if (trimmedSearch) {
+          params.append("search", trimmedSearch);
         }
 
         const response = await axios.get(
@@ -157,20 +243,14 @@ function Qrcode() {
           authConfig,
         );
 
-        console.log(
-          "Doctors Response:",
-          response.data,
-        );
+        console.log("Doctors Response:", response.data);
 
-        setDoctors(
-          response.data.data || [],
-        );
+        setDoctors(response.data.data || []);
       } catch (error) {
         console.error(
           "Doctors Error:",
           error.response?.status,
-          error.response?.data ||
-            error.message,
+          error.response?.data || error.message,
         );
 
         setDoctors([]);
@@ -193,42 +273,31 @@ function Qrcode() {
   // GET ALL DOCTORS FOR EXPORT
   // ==========================================
 
-  const fetchAllDoctorsForExport =
-    useCallback(async () => {
-      try {
-        console.log(
-          "Fetching ALL doctors for Excel export...",
-        );
+  const fetchAllDoctorsForExport = useCallback(async () => {
+    try {
+      console.log("Fetching ALL doctors for Excel export...");
 
-        const response = await axios.get(
-          "/api/doctors/export",
-          authConfig,
-        );
+      const response = await axios.get("/api/doctors/export", authConfig);
 
-        console.log(
-          "Export Doctors Response:",
-          response.data,
-        );
+      console.log("Export Doctors Response:", response.data);
 
-        const allDoctors =
-          response.data.data || [];
+      const allDoctors = response.data.data || [];
 
-        setExportDoctors(allDoctors);
+      setExportDoctors(allDoctors);
 
-        return allDoctors;
-      } catch (error) {
-        console.error(
-          "Export Doctors Error:",
-          error.response?.status,
-          error.response?.data ||
-            error.message,
-        );
+      return allDoctors;
+    } catch (error) {
+      console.error(
+        "Export Doctors Error:",
+        error.response?.status,
+        error.response?.data || error.message,
+      );
 
-        setExportDoctors([]);
+      setExportDoctors([]);
 
-        return [];
-      }
-    }, [authConfig]);
+      return [];
+    }
+  }, [authConfig]);
 
   // ==========================================
   // GET CAMPAIGNS
@@ -241,34 +310,21 @@ function Qrcode() {
       try {
         setCampaignsLoading(true);
 
-        console.log(
-          "Fetching Campaigns...",
-        );
+        console.log("Fetching Campaigns...");
 
-        const response = await axios.get(
-          "/api/campaigns",
-          authConfig,
-        );
+        const response = await axios.get("/api/campaigns", authConfig);
 
         if (!cancelled) {
-          console.log(
-            "Campaigns Response:",
-            response.data,
-          );
+          console.log("Campaigns Response:", response.data);
 
-          setCampaigns(
-            response.data.data ||
-              response.data.campaigns ||
-              [],
-          );
+          setCampaigns(response.data.data || response.data.campaigns || []);
         }
       } catch (error) {
         if (!cancelled) {
           console.error(
             "Campaigns Error:",
             error.response?.status,
-            error.response?.data ||
-              error.message,
+            error.response?.data || error.message,
           );
 
           setCampaigns([]);
@@ -292,20 +348,13 @@ function Qrcode() {
   // ==========================================
 
   const handleGenerateQR = useCallback(
-    async ({
-      doctorId,
-      campaignId,
-      videoUrl,
-    }) => {
+    async ({ doctorId, campaignId, videoUrl }) => {
       try {
-        console.log(
-          "Generating QR with:",
-          {
-            doctorId,
-            campaignId,
-            videoUrl,
-          },
-        );
+        console.log("Generating QR with:", {
+          doctorId,
+          campaignId,
+          videoUrl,
+        });
 
         const payload = {
           doctorId,
@@ -313,51 +362,41 @@ function Qrcode() {
           quizId: null,
         };
 
-        console.log(
-          "Create QR Payload:",
-          payload,
-        );
+        console.log("Create QR Payload:", payload);
 
-        await axios.post(
-          "/api/qrcode/create",
-          payload,
+        await axios.post("/api/qrcode/create", payload, authConfig);
+
+        // ==========================================
+        // REFRESH DASHBOARD
+        // ==========================================
+
+        const dashboardResponse = await axios.get(
+          "/api/qrcode/dashboard",
           authConfig,
         );
 
-        // Refresh dashboard only
-        const dashboardResponse =
-          await axios.get(
-            "/api/qrcode/dashboard",
-            authConfig,
-          );
+        setQrData(dashboardResponse.data);
 
-        setQrData(
-          dashboardResponse.data,
-        );
+        // ==========================================
+        // REFRESH CURRENT QR LIST PAGE
+        // ==========================================
 
-        console.log(
-          "Video URL entered:",
-          videoUrl,
-        );
+        await fetchQrList(qrPage, qrLimit);
 
-        alert(
-          "QR code generated successfully.",
-        );
+        console.log("Video URL entered:", videoUrl);
+
+        alert("QR code generated successfully.");
       } catch (error) {
         console.error(
           "Generate QR Error:",
           error.response?.status,
-          error.response?.data ||
-            error.message,
+          error.response?.data || error.message,
         );
 
-        alert(
-          error.response?.data?.message ||
-            "Failed to generate QR code.",
-        );
+        alert(error.response?.data?.message || "Failed to generate QR code.");
       }
     },
-    [authConfig],
+    [authConfig, fetchQrList, qrPage, qrLimit],
   );
 
   // ==========================================
@@ -371,10 +410,7 @@ function Qrcode() {
       try {
         setGraphLoading(true);
 
-        console.log(
-          "Fetching QR Graph Data:",
-          graphRange,
-        );
+        console.log("Fetching QR Graph Data:", graphRange);
 
         const response = await axios.get(
           `/api/qrcode/qr-scans?range=${graphRange}`,
@@ -382,22 +418,16 @@ function Qrcode() {
         );
 
         if (!cancelled) {
-          console.log(
-            "QR Graph Response:",
-            response.data,
-          );
+          console.log("QR Graph Response:", response.data);
 
-          setQrGraphData(
-            response.data.data || [],
-          );
+          setQrGraphData(response.data.data || []);
         }
       } catch (error) {
         if (!cancelled) {
           console.error(
             "QR Graph Error:",
             error.response?.status,
-            error.response?.data ||
-              error.message,
+            error.response?.data || error.message,
           );
 
           setQrGraphData([]);
@@ -427,9 +457,7 @@ function Qrcode() {
       try {
         setLocationLoading(true);
 
-        console.log(
-          "Fetching Top Locations...",
-        );
+        console.log("Fetching Top Locations...");
 
         const response = await axios.get(
           "/api/analytics/adminDashboard",
@@ -437,30 +465,20 @@ function Qrcode() {
         );
 
         if (!cancelled) {
-          console.log(
-            "Admin Dashboard Response:",
-            response.data,
-          );
+          console.log("Admin Dashboard Response:", response.data);
 
-          const dashboardData =
-            response.data.data || {};
+          const dashboardData = response.data.data || {};
 
-          setTotalScans(
-            dashboardData.totalScans || 0,
-          );
+          setTotalScans(dashboardData.totalScans || 0);
 
-          setTopCities(
-            dashboardData.locationData
-              ?.topCities || [],
-          );
+          setTopCities(dashboardData.locationData?.topCities || []);
         }
       } catch (error) {
         if (!cancelled) {
           console.error(
             "Top Locations Error:",
             error.response?.status,
-            error.response?.data ||
-              error.message,
+            error.response?.data || error.message,
           );
 
           setTopCities([]);
@@ -497,9 +515,7 @@ function Qrcode() {
         doctorsLoading={doctorsLoading}
         campaignsLoading={campaignsLoading}
         onSearchDoctors={fetchDoctors}
-        onFetchExportDoctors={
-          fetchAllDoctorsForExport
-        }
+        onFetchExportDoctors={fetchAllDoctorsForExport}
         onGenerateQR={handleGenerateQR}
       />
 
@@ -518,8 +534,14 @@ function Qrcode() {
       {/* ================= QR BOTTOM ================= */}
 
       <QrBottom
-        data={qrData}
-        loading={loading}
+        data={qrList}
+        loading={qrListLoading}
+        page={qrPage}
+        pages={qrPages}
+        total={qrTotal}
+        limit={qrLimit}
+        onPageChange={handleQrPageChange}
+        onLimitChange={handleQrLimitChange}
       />
     </>
   );
