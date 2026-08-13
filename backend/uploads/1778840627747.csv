@@ -1,0 +1,101 @@
+DOCTORNAME,SPECIALTY,QUALIFICATION,REGISTRATIONNO,EMAIL,MOBILE,ADDRESS,CLINIC,CITY,STATE,CAMPAIGN,MRID
+Dr. Megha Patel,Cardiologist,MD,MMC1001,doctor001@mail.com,9700000001,1 Doctor Lane,City Care Clinic,Mumbai,Maharashtra,GERD Awareness Quiz,MR001
+Dr. Vivaan Desai,Diabetologist,MD,MMC1002,doctor002@mail.com,9700000002,2 Doctor Lane,Sunrise Hospital,Pune,Maharashtra,GERD Awareness Quiz,MR002
+Dr. Pankaj Joshi,General Physician,MD,MMC1003,doctor003@mail.com,9700000003,3 Doctor Lane,Wellness Center,Delhi,Delhi,GERD Awareness Quiz,MR003
+Dr. Nikhil Patel,Orthopedic,MD,MMC1004,doctor004@mail.com,9700000004,4 Doctor Lane,LifeLine Clinic,Ahmedabad,Gujarat,GERD Awareness Quiz,MR004
+Dr. Komal Pandey,Pediatrician,MD,MMC1005,doctor005@mail.com,9700000005,5 Doctor Lane,Metro Health Point,Jaipur,Rajasthan,GERD Awareness Quiz,MR005
+Dr. Rahul Chauhan,Pulmonologist,MD,MMC1006,doctor006@mail.com,9700000006,6 Doctor Lane,Apex Medicare,Lucknow,Uttar Pradesh,GERD Awareness Quiz,MR006
+Dr. Gaurav Verma,Gastroenterologist,MD,MMC1007,doctor007@mail.com,9700000007,7 Doctor Lane,Green Cross Clinic,Bengaluru,Karnataka,GERD Awareness Quiz,MR007
+Dr. Vivaan Gupta,Dermatologist,MD,MMC1008,doctor008@mail.com,9700000008,8 Doctor Lane,Prime Health Hub,Chennai,Tamil Nadu,GERD Awareness Quiz,MR008
+Dr. Manish Joshi,Cardiologist,MD,MMC1009,doctor009@mail.com,9700000009,9 Doctor Lane,City Care Clinic,Hyderabad,Telangana,GERD Awareness Quiz,MR009
+Dr. Pooja Bansal,Diabetologist,MD,MMC1010,doctor010@mail.com,9700000010,10 Doctor Lane,Sunrise Hospital,Kolkata,West Bengal,GERD Awareness Quiz,MR010
+Dr. Vivaan Pandey,General Physician,MD,MMC1011,doctor011@mail.com,9700000011,11 Doctor Lane,Wellness Center,Mumbai,Maharashtra,GERD Awareness Quiz,MR011
+Dr. Ankit Pandey,Orthopedic,MD,MMC1012,doctor012@mail.com,9700000012,12 Doctor Lane,LifeLine Clinic,Pune,Maharashtra,GERD Awareness Quiz,MR012
+Dr. Saurabh Joshi,Pediatrician,MD,MMC1013,doctor013@mail.com,9700000013,13 Doctor Lane,Metro Health Point,Delhi,Delhi,GERD Awareness Quiz,MR013
+Dr. Shubham Chauhan,Pulmonologist,MD,MMC1014,doctor014@mail.com,9700000014,14 Doctor Lane,Apex Medicare,Ahmedabad,Gujarat,GERD Awareness Quiz,MR014
+Dr. Ashish Sharma,Gastroenterologist,MD,MMC1015,doctor015@mail.com,9700000015,15 Doctor Lane,Green Cross Clinic,Jaipur,Rajasthan,GERD Awareness Quiz,MR015
+Dr. Rashmi Kumar,Dermatologist,MD,MMC1016,doctor016@mail.com,9700000016,16 Doctor Lane,Prime Health Hub,Lucknow,Uttar Pradesh,GERD Awareness Quiz,MR016
+Dr. Divya Mehta,Cardiologist,MD,MMC1017,doctor017@mail.com,9700000017,17 Doctor Lane,City Care Clinic,Bengaluru,Karnataka,GERD Awareness Quiz,MR017
+Dr. Harsh Desai,Diabetologist,MD,MMC1018,doctor018@mail.com,9700000018,18 Doctor Lane,Sunrise Hospital,Chennai,Tamil Nadu,GERD Awareness Quiz,MR018
+Dr. Sandeep Jain,General Physician,MD,MMC1019,doctor019@mail.com,9700000019,19 Doctor Lane,Wellness Center,Hyderabad,Telangana,GERD Awareness Quiz,MR019
+Dr. Rashmi Reddy,Orthopedic,MD,MMC1020,doctor020@mail.com,9700000020,20 Doctor Lane,LifeLine Clinic,Kolkata,West Bengal,GERD Awareness Quiz,MR020
+Dr. Amit Gupta,Pediatrician,MD,MMC1021,doctor021@mail.com,9700000021,21 Doctor Lane,Metro Health Point,Mumbai,Maharashtra,GERD Awareness Quiz,MR021
+Dr. Rajat Patel,Pulmonologist,MD,MMC1022,doctor022@mail.com,9700000022,22 Doctor Lane,Apex Medicare,Pune,Maharashtra,GERD Awareness Quiz,MR022
+Dr. Nitin Naidu,Gastroenterologist,MD,MMC1023,doctor023@mail.com,9700000023,23 Doctor Lane,Green Cross Clinic,Delhi,Delhi,GERD Awareness Quiz,MR023
+Dr. Riya Desai,Dermatologist,MD,MMC1024,doctor024@mail.com,9700000024,24 Doctor Lane,Prime Health Hub,Ahmedabad,Gujarat,GERD Awareness Quiz,MR024
+Dr. Aditya Agarwal,Cardiologist,MD,MMC1025,doctor025@mail.com,9700000025,25 Doctor Lane,City Care Clinic,Jaipur,Rajasthan,GERD Awareness Quiz,MR025
+Dr. Sneha Patel,Diabetologist,MD,MMC1026,doctor026@mail.com,9700000026,26 Doctor Lane,Sunrise Hospital,Lucknow,Uttar Pradesh,GERD Awareness Quiz,MR026
+Dr. Rajat Gupta,General Physician,MD,MMC1027,doctor027@mail.com,9700000027,27 Doctor Lane,Wellness Center,Bengaluru,Karnataka,GERD Awareness Quiz,MR027
+Dr. Shweta Shah,Orthopedic,MD,MMC1028,doctor028@mail.com,9700000028,28 Doctor Lane,LifeLine Clinic,Chennai,Tamil Nadu,GERD Awareness Quiz,MR028
+Dr. Megha Bansal,Pediatrician,MD,MMC1029,doctor029@mail.com,9700000029,29 Doctor Lane,Metro Health Point,Hyderabad,Telangana,GERD Awareness Quiz,MR029
+Dr. Sumit Chauhan,Pulmonologist,MD,MMC1030,doctor030@mail.com,9700000030,30 Doctor Lane,Apex Medicare,Kolkata,West Bengal,GERD Awareness Quiz,MR030
+Dr. Ankit Gupta,Gastroenterologist,MD,MMC1031,doctor031@mail.com,9700000031,31 Doctor Lane,Green Cross Clinic,Mumbai,Maharashtra,GERD Awareness Quiz,MR031
+Dr. Aditya Joshi,Dermatologist,MD,MMC1032,doctor032@mail.com,9700000032,32 Doctor Lane,Prime Health Hub,Pune,Maharashtra,GERD Awareness Quiz,MR032
+Dr. Simran Shah,Cardiologist,MD,MMC1033,doctor033@mail.com,9700000033,33 Doctor Lane,City Care Clinic,Delhi,Delhi,GERD Awareness Quiz,MR033
+Dr. Rahul Joshi,Diabetologist,MD,MMC1034,doctor034@mail.com,9700000034,34 Doctor Lane,Sunrise Hospital,Ahmedabad,Gujarat,GERD Awareness Quiz,MR034
+Dr. Amit Kapoor,General Physician,MD,MMC1035,doctor035@mail.com,9700000035,35 Doctor Lane,Wellness Center,Jaipur,Rajasthan,GERD Awareness Quiz,MR035
+Dr. Ashish Agarwal,Orthopedic,MD,MMC1036,doctor036@mail.com,9700000036,36 Doctor Lane,LifeLine Clinic,Lucknow,Uttar Pradesh,GERD Awareness Quiz,MR036
+Dr. Megha Naidu,Pediatrician,MD,MMC1037,doctor037@mail.com,9700000037,37 Doctor Lane,Metro Health Point,Bengaluru,Karnataka,GERD Awareness Quiz,MR037
+Dr. Karan Naidu,Pulmonologist,MD,MMC1038,doctor038@mail.com,9700000038,38 Doctor Lane,Apex Medicare,Chennai,Tamil Nadu,GERD Awareness Quiz,MR038
+Dr. Nitin Jain,Gastroenterologist,MD,MMC1039,doctor039@mail.com,9700000039,39 Doctor Lane,Green Cross Clinic,Hyderabad,Telangana,GERD Awareness Quiz,MR039
+Dr. Swati Desai,Dermatologist,MD,MMC1040,doctor040@mail.com,9700000040,40 Doctor Lane,Prime Health Hub,Kolkata,West Bengal,GERD Awareness Quiz,MR040
+Dr. Divya Gupta,Cardiologist,MD,MMC1041,doctor041@mail.com,9700000041,41 Doctor Lane,City Care Clinic,Mumbai,Maharashtra,GERD Awareness Quiz,MR041
+Dr. Riya Kumar,Diabetologist,MD,MMC1042,doctor042@mail.com,9700000042,42 Doctor Lane,Sunrise Hospital,Pune,Maharashtra,GERD Awareness Quiz,MR042
+Dr. Sneha Joshi,General Physician,MD,MMC1043,doctor043@mail.com,9700000043,43 Doctor Lane,Wellness Center,Delhi,Delhi,GERD Awareness Quiz,MR043
+Dr. Karan Agarwal,Orthopedic,MD,MMC1044,doctor044@mail.com,9700000044,44 Doctor Lane,LifeLine Clinic,Ahmedabad,Gujarat,GERD Awareness Quiz,MR044
+Dr. Rajat Desai,Pediatrician,MD,MMC1045,doctor045@mail.com,9700000045,45 Doctor Lane,Metro Health Point,Jaipur,Rajasthan,GERD Awareness Quiz,MR045
+Dr. Megha Pandey,Pulmonologist,MD,MMC1046,doctor046@mail.com,9700000046,46 Doctor Lane,Apex Medicare,Lucknow,Uttar Pradesh,GERD Awareness Quiz,MR046
+Dr. Ritesh Reddy,Gastroenterologist,MD,MMC1047,doctor047@mail.com,9700000047,47 Doctor Lane,Green Cross Clinic,Bengaluru,Karnataka,GERD Awareness Quiz,MR047
+Dr. Simran Verma,Dermatologist,MD,MMC1048,doctor048@mail.com,9700000048,48 Doctor Lane,Prime Health Hub,Chennai,Tamil Nadu,GERD Awareness Quiz,MR048
+Dr. Ritesh Verma,Cardiologist,MD,MMC1049,doctor049@mail.com,9700000049,49 Doctor Lane,City Care Clinic,Hyderabad,Telangana,GERD Awareness Quiz,MR049
+Dr. Abhishek Kapoor,Diabetologist,MD,MMC1050,doctor050@mail.com,9700000050,50 Doctor Lane,Sunrise Hospital,Kolkata,West Bengal,GERD Awareness Quiz,MR050
+Dr. Ashish Gupta,General Physician,MD,MMC1051,doctor051@mail.com,9700000051,51 Doctor Lane,Wellness Center,Mumbai,Maharashtra,GERD Awareness Quiz,MR051
+Dr. Manish Chauhan,Orthopedic,MD,MMC1052,doctor052@mail.com,9700000052,52 Doctor Lane,LifeLine Clinic,Pune,Maharashtra,GERD Awareness Quiz,MR052
+Dr. Isha Reddy,Pediatrician,MD,MMC1053,doctor053@mail.com,9700000053,53 Doctor Lane,Metro Health Point,Delhi,Delhi,GERD Awareness Quiz,MR053
+Dr. Manish Yadav,Pulmonologist,MD,MMC1054,doctor054@mail.com,9700000054,54 Doctor Lane,Apex Medicare,Ahmedabad,Gujarat,GERD Awareness Quiz,MR054
+Dr. Pradeep Agarwal,Gastroenterologist,MD,MMC1055,doctor055@mail.com,9700000055,55 Doctor Lane,Green Cross Clinic,Jaipur,Rajasthan,GERD Awareness Quiz,MR055
+Dr. Sandeep Desai,Dermatologist,MD,MMC1056,doctor056@mail.com,9700000056,56 Doctor Lane,Prime Health Hub,Lucknow,Uttar Pradesh,GERD Awareness Quiz,MR056
+Dr. Nikhil Joshi,Cardiologist,MD,MMC1057,doctor057@mail.com,9700000057,57 Doctor Lane,City Care Clinic,Bengaluru,Karnataka,GERD Awareness Quiz,MR057
+Dr. Sonal Pandey,Diabetologist,MD,MMC1058,doctor058@mail.com,9700000058,58 Doctor Lane,Sunrise Hospital,Chennai,Tamil Nadu,GERD Awareness Quiz,MR058
+Dr. Sneha Desai,General Physician,MD,MMC1059,doctor059@mail.com,9700000059,59 Doctor Lane,Wellness Center,Hyderabad,Telangana,GERD Awareness Quiz,MR059
+Dr. Sonal Chauhan,Orthopedic,MD,MMC1060,doctor060@mail.com,9700000060,60 Doctor Lane,LifeLine Clinic,Kolkata,West Bengal,GERD Awareness Quiz,MR060
+Dr. Gaurav Chauhan,Pediatrician,MD,MMC1061,doctor061@mail.com,9700000061,61 Doctor Lane,Metro Health Point,Mumbai,Maharashtra,GERD Awareness Quiz,MR061
+Dr. Pradeep Naidu,Pulmonologist,MD,MMC1062,doctor062@mail.com,9700000062,62 Doctor Lane,Apex Medicare,Pune,Maharashtra,GERD Awareness Quiz,MR062
+Dr. Ritesh Singh,Gastroenterologist,MD,MMC1063,doctor063@mail.com,9700000063,63 Doctor Lane,Green Cross Clinic,Delhi,Delhi,GERD Awareness Quiz,MR063
+Dr. Pooja Yadav,Dermatologist,MD,MMC1064,doctor064@mail.com,9700000064,64 Doctor Lane,Prime Health Hub,Ahmedabad,Gujarat,GERD Awareness Quiz,MR064
+Dr. Rahul Verma,Cardiologist,MD,MMC1065,doctor065@mail.com,9700000065,65 Doctor Lane,City Care Clinic,Jaipur,Rajasthan,GERD Awareness Quiz,MR065
+Dr. Vikas Singh,Diabetologist,MD,MMC1066,doctor066@mail.com,9700000066,66 Doctor Lane,Sunrise Hospital,Lucknow,Uttar Pradesh,GERD Awareness Quiz,MR066
+Dr. Megha Kumar,General Physician,MD,MMC1067,doctor067@mail.com,9700000067,67 Doctor Lane,Wellness Center,Bengaluru,Karnataka,GERD Awareness Quiz,MR067
+Dr. Komal Mehta,Orthopedic,MD,MMC1068,doctor068@mail.com,9700000068,68 Doctor Lane,LifeLine Clinic,Chennai,Tamil Nadu,GERD Awareness Quiz,MR068
+Dr. Riya Gupta,Pediatrician,MD,MMC1069,doctor069@mail.com,9700000069,69 Doctor Lane,Metro Health Point,Hyderabad,Telangana,GERD Awareness Quiz,MR069
+Dr. Rajat Kapoor,Pulmonologist,MD,MMC1070,doctor070@mail.com,9700000070,70 Doctor Lane,Apex Medicare,Kolkata,West Bengal,GERD Awareness Quiz,MR070
+Dr. Riya Agarwal,Gastroenterologist,MD,MMC1071,doctor071@mail.com,9700000071,71 Doctor Lane,Green Cross Clinic,Mumbai,Maharashtra,GERD Awareness Quiz,MR071
+Dr. Anjali Desai,Dermatologist,MD,MMC1072,doctor072@mail.com,9700000072,72 Doctor Lane,Prime Health Hub,Pune,Maharashtra,GERD Awareness Quiz,MR072
+Dr. Shweta Sharma,Cardiologist,MD,MMC1073,doctor073@mail.com,9700000073,73 Doctor Lane,City Care Clinic,Delhi,Delhi,GERD Awareness Quiz,MR073
+Dr. Komal Patel,Diabetologist,MD,MMC1074,doctor074@mail.com,9700000074,74 Doctor Lane,Sunrise Hospital,Ahmedabad,Gujarat,GERD Awareness Quiz,MR074
+Dr. Komal Pandey,General Physician,MD,MMC1075,doctor075@mail.com,9700000075,75 Doctor Lane,Wellness Center,Jaipur,Rajasthan,GERD Awareness Quiz,MR075
+Dr. Rashmi Desai,Orthopedic,MD,MMC1076,doctor076@mail.com,9700000076,76 Doctor Lane,LifeLine Clinic,Lucknow,Uttar Pradesh,GERD Awareness Quiz,MR076
+Dr. Simran Reddy,Pediatrician,MD,MMC1077,doctor077@mail.com,9700000077,77 Doctor Lane,Metro Health Point,Bengaluru,Karnataka,GERD Awareness Quiz,MR077
+Dr. Vikas Shah,Pulmonologist,MD,MMC1078,doctor078@mail.com,9700000078,78 Doctor Lane,Apex Medicare,Chennai,Tamil Nadu,GERD Awareness Quiz,MR078
+Dr. Gaurav Kumar,Gastroenterologist,MD,MMC1079,doctor079@mail.com,9700000079,79 Doctor Lane,Green Cross Clinic,Hyderabad,Telangana,GERD Awareness Quiz,MR079
+Dr. Vikram Sharma,Dermatologist,MD,MMC1080,doctor080@mail.com,9700000080,80 Doctor Lane,Prime Health Hub,Kolkata,West Bengal,GERD Awareness Quiz,MR080
+Dr. Tanya Desai,Cardiologist,MD,MMC1081,doctor081@mail.com,9700000081,81 Doctor Lane,City Care Clinic,Mumbai,Maharashtra,GERD Awareness Quiz,MR081
+Dr. Pooja Kumar,Diabetologist,MD,MMC1082,doctor082@mail.com,9700000082,82 Doctor Lane,Sunrise Hospital,Pune,Maharashtra,GERD Awareness Quiz,MR082
+Dr. Pooja Patel,General Physician,MD,MMC1083,doctor083@mail.com,9700000083,83 Doctor Lane,Wellness Center,Delhi,Delhi,GERD Awareness Quiz,MR083
+Dr. Megha Shah,Orthopedic,MD,MMC1084,doctor084@mail.com,9700000084,84 Doctor Lane,LifeLine Clinic,Ahmedabad,Gujarat,GERD Awareness Quiz,MR084
+Dr. Megha Mishra,Pediatrician,MD,MMC1085,doctor085@mail.com,9700000085,85 Doctor Lane,Metro Health Point,Jaipur,Rajasthan,GERD Awareness Quiz,MR085
+Dr. Riya Jain,Pulmonologist,MD,MMC1086,doctor086@mail.com,9700000086,86 Doctor Lane,Apex Medicare,Lucknow,Uttar Pradesh,GERD Awareness Quiz,MR086
+Dr. Sandeep Naidu,Gastroenterologist,MD,MMC1087,doctor087@mail.com,9700000087,87 Doctor Lane,Green Cross Clinic,Bengaluru,Karnataka,GERD Awareness Quiz,MR087
+Dr. Rashmi Kumar,Dermatologist,MD,MMC1088,doctor088@mail.com,9700000088,88 Doctor Lane,Prime Health Hub,Chennai,Tamil Nadu,GERD Awareness Quiz,MR088
+Dr. Sneha Mishra,Cardiologist,MD,MMC1089,doctor089@mail.com,9700000089,89 Doctor Lane,City Care Clinic,Hyderabad,Telangana,GERD Awareness Quiz,MR089
+Dr. Aarav Bansal,Diabetologist,MD,MMC1090,doctor090@mail.com,9700000090,90 Doctor Lane,Sunrise Hospital,Kolkata,West Bengal,GERD Awareness Quiz,MR090
+Dr. Abhishek Yadav,General Physician,MD,MMC1091,doctor091@mail.com,9700000091,91 Doctor Lane,Wellness Center,Mumbai,Maharashtra,GERD Awareness Quiz,MR091
+Dr. Vivaan Patel,Orthopedic,MD,MMC1092,doctor092@mail.com,9700000092,92 Doctor Lane,LifeLine Clinic,Pune,Maharashtra,GERD Awareness Quiz,MR092
+Dr. Sumit Shah,Pediatrician,MD,MMC1093,doctor093@mail.com,9700000093,93 Doctor Lane,Metro Health Point,Delhi,Delhi,GERD Awareness Quiz,MR093
+Dr. Pankaj Verma,Pulmonologist,MD,MMC1094,doctor094@mail.com,9700000094,94 Doctor Lane,Apex Medicare,Ahmedabad,Gujarat,GERD Awareness Quiz,MR094
+Dr. Pankaj Chauhan,Gastroenterologist,MD,MMC1095,doctor095@mail.com,9700000095,95 Doctor Lane,Green Cross Clinic,Jaipur,Rajasthan,GERD Awareness Quiz,MR095
+Dr. Rahul Gupta,Dermatologist,MD,MMC1096,doctor096@mail.com,9700000096,96 Doctor Lane,Prime Health Hub,Lucknow,Uttar Pradesh,GERD Awareness Quiz,MR096
+Dr. Tanya Yadav,Cardiologist,MD,MMC1097,doctor097@mail.com,9700000097,97 Doctor Lane,City Care Clinic,Bengaluru,Karnataka,GERD Awareness Quiz,MR097
+Dr. Rohan Pandey,Diabetologist,MD,MMC1098,doctor098@mail.com,9700000098,98 Doctor Lane,Sunrise Hospital,Chennai,Tamil Nadu,GERD Awareness Quiz,MR098
+Dr. Simran Singh,General Physician,MD,MMC1099,doctor099@mail.com,9700000099,99 Doctor Lane,Wellness Center,Hyderabad,Telangana,GERD Awareness Quiz,MR099
+Dr. Nikhil Yadav,Orthopedic,MD,MMC1100,doctor100@mail.com,9700000100,100 Doctor Lane,LifeLine Clinic,Kolkata,West Bengal,GERD Awareness Quiz,MR100

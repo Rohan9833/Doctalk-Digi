@@ -1,0 +1,14 @@
+const express = require("express");
+const router = express.Router();
+const
+  { getQRDashboard, getQRScansOverTime,createQr, }
+    = require("../Controller/Qrcodecontroller.js");
+
+
+// Admin route
+router.get("/dashboard", getQRDashboard);
+router.get("/qr-scans", getQRScansOverTime);
+router.post("/create", createQr);
+
+
+module.exports = router;
