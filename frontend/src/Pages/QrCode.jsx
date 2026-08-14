@@ -22,6 +22,7 @@ function Qrcode() {
   const [qrListLoading, setQrListLoading] = useState(true);
 
   // SERVER PAGINATION
+
   const [qrPage, setQrPage] = useState(1);
   const [qrLimit, setQrLimit] = useState(10);
   const [qrTotal, setQrTotal] = useState(0);
@@ -400,6 +401,63 @@ function Qrcode() {
   );
 
   // ==========================================
+  // EDIT QR
+  // ==========================================
+
+  const handleEditQR = useCallback(
+    async (qrId, updateData) => {
+      try {
+        console.log("Updating QR:", {
+          qrId,
+          updateData,
+        });
+
+        const response = await axios.put(
+          `/api/qrcode/edit/${qrId}`,
+          updateData,
+          authConfig,
+        );
+
+        console.log("Update QR Response:", response.data);
+
+        const updatedQR = response.data.data;
+
+        // ==========================================
+        // UPDATE QR LIST WITHOUT PAGE REFRESH
+        // ==========================================
+
+        setQrList((previousList) =>
+          previousList.map((qr) =>
+            qr.id === updatedQR.id || qr._id === updatedQR._id ? updatedQR : qr,
+          ),
+        );
+
+        // ==========================================
+        // REFRESH DASHBOARD
+        // ==========================================
+
+        const dashboardResponse = await axios.get(
+          "/api/qrcode/dashboard",
+          authConfig,
+        );
+
+        setQrData(dashboardResponse.data);
+
+        return updatedQR;
+      } catch (error) {
+        console.error(
+          "Update QR Error:",
+          error.response?.status,
+          error.response?.data || error.message,
+        );
+
+        throw error;
+      }
+    },
+    [authConfig],
+  );
+
+  // ==========================================
   // GET QR GRAPH DATA
   // ==========================================
 
@@ -413,7 +471,7 @@ function Qrcode() {
         console.log("Fetching QR Graph Data:", graphRange);
 
         const response = await axios.get(
-          `/api/qrcode/qr-scans?range=${graphRange}`,
+          `/api/qrcode/qr-scans-over-time?range=${graphRange}`,
           authConfig,
         );
 
@@ -542,6 +600,7 @@ function Qrcode() {
         limit={qrLimit}
         onPageChange={handleQrPageChange}
         onLimitChange={handleQrLimitChange}
+        onEditQR={handleEditQR}
       />
     </>
   );

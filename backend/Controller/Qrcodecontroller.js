@@ -5,6 +5,8 @@ const QR = require("../Model/QRModel");
 const Campaign = require("../Model/CampaignModel");
 const Quiz = require("../Model/QuizModel");
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
+const getUserDeviceInfo = require("../services/getDeviceService");
 
 // =====================================================
 // get All QR
@@ -219,7 +221,6 @@ const getAllQr = async (req, res) => {
   }
 };
 
-
 // =====================================================
 // CREATE QR
 // =====================================================
@@ -361,7 +362,9 @@ const createQr = async (req, res) => {
     // STEP 08 - CREATE QR URL
     // ============================================================
 
-    const baseUrl = process.env.QR_BASE_URL || "http://192.168.1.37:2468";
+    const baseUrl =
+      process.env.QR_BASE_URL ||
+      "https://duplex-slate-kilobyte.ngrok-free.dev" ;
 
     const qrUrl = `${baseUrl}/q/${shortCode}`;
 
@@ -383,6 +386,7 @@ const createQr = async (req, res) => {
         light: "#ffffff",
       },
     });
+    console.log("qrcode",qrUrl)
 
     // ============================================================
     // STEP 11 - PREPARE DATABASE OBJECT
@@ -718,9 +722,339 @@ const getQRScansOverTime = async (req, res) => {
   }
 };
 
+// ======================================================
+// TRACK QR SCAN
+// ======================================================
+const trackQrScan = async (req, res) => {
+  try {
+    const { shortCode } = req.params;
+
+    // ==========================================
+    // 1. VALIDATE SHORT CODE
+    // ==========================================
+
+    if (!shortCode) {
+      return res.status(400).json({
+        success: false,
+        message: "QR short code is required.",
+      });
+    }
+
+    // ==========================================
+    // 2. FIND QR
+    // ==========================================
+
+    const qr = await QR.findOne({
+      shortCode: shortCode.trim().toUpperCase(),
+      status: "active",
+    }).lean();
+
+    if (!qr) {
+      return res.status(404).json({
+        success: false,
+        message: "QR code not found or inactive.",
+      });
+    }
+
+    // ==========================================
+    // 3. GET USER INFORMATION
+    // ==========================================
+
+    const deviceInfo = await getUserDeviceInfo(req);
+
+    // ==========================================
+    // 4. GENERATE SESSION ID
+    // ==========================================
+
+    const sessionId = uuidv4();
+
+    // ==========================================
+    // 5. CREATE COMPLETE QR SCAN
+    // ==========================================
+
+    const scan = await QRScan.create({
+      // QR relation
+      qr: qr._id,
+
+      // Doctor & Campaign relations
+      doctor: qr.doctor,
+      campaign: qr.campaign,
+
+      // Quiz
+      quizAttempt: null,
+
+      // Session
+      sessionId,
+
+      // Location
+      city: deviceInfo.city || null,
+      state: deviceInfo.state || null,
+
+      // Network
+      ipAddress: deviceInfo.ipAddress || null,
+
+      // Device
+      deviceType: deviceInfo.deviceType || "unknown",
+      userAgent: deviceInfo.userAgent || "unknown",
+
+      // Conversion
+      converted: false,
+
+      // Scan time
+      scannedAt: new Date(),
+    });
+
+    // ==========================================
+    // 6. CHECK DESTINATION URL
+    // ==========================================
+
+    if (!qr.destinationUrl) {
+      return res.status(200).json({
+        success: true,
+        message: "QR scan registered, but destination URL is not configured.",
+
+        data: {
+          id: scan._id,
+          qr: scan.qr,
+          doctor: scan.doctor,
+          campaign: scan.campaign,
+          sessionId: scan.sessionId,
+        },
+      });
+    }
+
+    // ==========================================
+    // 7. REDIRECT USER
+    // ==========================================
+
+    return res.redirect(qr.destinationUrl);
+  } catch (error) {
+    console.error("Track QR Scan Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to process QR scan.",
+      error: error.message,
+    });
+  }
+};
+
+
+
+// =====================================================
+// UPDATE QR
+// =====================================================
+
+const updateQr = async (req, res) => {
+  try {
+    const { qrId } = req.params;
+
+    const {
+      doctor,
+      campaign,
+      destinationType,
+      destinationUrl,
+      status,
+      expiresAt,
+    } = req.body;
+
+    // =====================================================
+    // VALIDATE QR ID
+    // =====================================================
+
+    if (!mongoose.Types.ObjectId.isValid(qrId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid QR ID",
+      });
+    }
+
+    // =====================================================
+    // FIND QR
+    // =====================================================
+
+    const qr = await QR.findById(qrId);
+
+    if (!qr) {
+      return res.status(404).json({
+        success: false,
+        message: "QR code not found",
+      });
+    }
+
+    // =====================================================
+    // UPDATE DOCTOR
+    // =====================================================
+
+    if (doctor !== undefined) {
+      if (!mongoose.Types.ObjectId.isValid(doctor)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid doctor ID",
+        });
+      }
+
+      const existingDoctor = await Doctor.findById(doctor);
+
+      if (!existingDoctor) {
+        return res.status(404).json({
+          success: false,
+          message: "Doctor not found",
+        });
+      }
+
+      qr.doctor = doctor;
+    }
+
+    // =====================================================
+    // UPDATE CAMPAIGN
+    // =====================================================
+
+    if (campaign !== undefined) {
+      if (!mongoose.Types.ObjectId.isValid(campaign)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid campaign ID",
+        });
+      }
+
+      const existingCampaign = await Campaign.findById(campaign);
+
+      if (!existingCampaign) {
+        return res.status(404).json({
+          success: false,
+          message: "Campaign not found",
+        });
+      }
+
+      qr.campaign = campaign;
+    }
+
+    // =====================================================
+    // UPDATE DESTINATION TYPE
+    // =====================================================
+
+    if (destinationType !== undefined) {
+      const allowedDestinationTypes = [
+        "video",
+        "quiz",
+        "landing_page",
+      ];
+
+      if (!allowedDestinationTypes.includes(destinationType)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid destination type. Allowed values: video, quiz, landing_page",
+        });
+      }
+
+      qr.destinationType = destinationType;
+    }
+
+    // =====================================================
+    // UPDATE DESTINATION URL
+    // =====================================================
+
+    if (destinationUrl !== undefined) {
+      qr.destinationUrl = destinationUrl?.trim() || null;
+    }
+
+    // =====================================================
+    // UPDATE STATUS
+    // =====================================================
+
+    if (status !== undefined) {
+      const allowedStatuses = [
+        "active",
+        "inactive",
+        "expired",
+      ];
+
+      if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid status. Allowed values: active, inactive, expired",
+        });
+      }
+
+      qr.status = status;
+    }
+
+    // =====================================================
+    // UPDATE EXPIRY
+    // =====================================================
+
+    if (expiresAt !== undefined) {
+      if (expiresAt === null || expiresAt === "") {
+        qr.expiresAt = null;
+      } else {
+        const expiryDate = new Date(expiresAt);
+
+        if (Number.isNaN(expiryDate.getTime())) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid expiresAt date",
+          });
+        }
+
+        qr.expiresAt = expiryDate;
+      }
+    }
+
+    // =====================================================
+    // IMPORTANT
+    // =====================================================
+    // We DO NOT change:
+    //
+    // qr.shortCode
+    // qr.qrCode
+    // qr.qrCodeSvg
+    //
+    // The existing QR image remains exactly the same.
+    // Only the destination/data behind the dynamic QR changes.
+    // =====================================================
+
+    // =====================================================
+    // SAVE QR
+    // =====================================================
+
+    await qr.save();
+
+    // =====================================================
+    // GET UPDATED QR
+    // =====================================================
+
+    const updatedQR = await QR.findById(qr._id)
+      .populate("doctor")
+      .populate("campaign")
+      .populate("quiz");
+
+    // =====================================================
+    // RESPONSE
+    // =====================================================
+
+    return res.status(200).json({
+      success: true,
+      message: "QR code updated successfully",
+      data: updatedQR,
+    });
+  } catch (error) {
+    console.error("Update QR Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update QR code",
+      error: error.message,
+    });
+  }
+};
 module.exports = {
   getQRDashboard,
   getQRScansOverTime,
   createQr,
   getAllQr,
+  trackQrScan,
+  updateQr
 };

@@ -54,58 +54,35 @@ function QRCodeDashboard({
 
   const dashboard = data?.data || {};
 
-  const totalQRCodes =
-    dashboard.totalQRCodes || 0;
+  const totalQRCodes = dashboard.totalQRCodes || 0;
 
-  const totalScans =
-    dashboard.totalScans || 0;
+  const totalScans = dashboard.totalScans || 0;
 
-  const uniqueScans =
-    dashboard.uniqueScans || 0;
+  const uniqueScans = dashboard.uniqueScans || 0;
 
-  const lastScan =
-    dashboard.lastScan || null;
+  const lastScan = dashboard.lastScan || null;
 
   // =====================================================
   // EXPORT STATE
   // =====================================================
 
-  const [exporting, setExporting] =
-    useState(false);
+  const [exporting, setExporting] = useState(false);
 
   // =====================================================
   // CREATE QR MODAL
   // =====================================================
 
-  const [
-    showGenerateModal,
-    setShowGenerateModal,
-  ] = useState(false);
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
 
-  const [
-    doctorSearch,
-    setDoctorSearch,
-  ] = useState("");
+  const [doctorSearch, setDoctorSearch] = useState("");
 
-  const [
-    selectedDoctor,
-    setSelectedDoctor,
-  ] = useState(null);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
 
-  const [
-    selectedCampaign,
-    setSelectedCampaign,
-  ] = useState("");
+  const [selectedCampaign, setSelectedCampaign] = useState("");
 
-  const [
-    videoUrl,
-    setVideoUrl,
-  ] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
 
-  const [
-    showCampaigns,
-    setShowCampaigns,
-  ] = useState(false);
+  const [showCampaigns, setShowCampaigns] = useState(false);
 
   // =====================================================
   // DOCTOR SEARCH
@@ -116,32 +93,23 @@ function QRCodeDashboard({
       return;
     }
 
-    const searchValue =
-      doctorSearch.trim();
+    const searchValue = doctorSearch.trim();
 
     const timer = setTimeout(() => {
-      onSearchDoctors?.(
-        searchValue,
-      );
+      onSearchDoctors?.(searchValue);
     }, 300);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [
-    doctorSearch,
-    showGenerateModal,
-    onSearchDoctors,
-  ]);
+  }, [doctorSearch, showGenerateModal, onSearchDoctors]);
 
   // =====================================================
   // FORMAT NUMBER
   // =====================================================
 
   const formatNumber = (number) => {
-    return Number(
-      number || 0,
-    ).toLocaleString("en-IN");
+    return Number(number || 0).toLocaleString("en-IN");
   };
 
   // =====================================================
@@ -149,12 +117,7 @@ function QRCodeDashboard({
   // =====================================================
 
   const averageScansPerQR =
-    totalQRCodes > 0
-      ? (
-          totalScans /
-          totalQRCodes
-        ).toFixed(2)
-      : "0.00";
+    totalQRCodes > 0 ? (totalScans / totalQRCodes).toFixed(2) : "0.00";
 
   // =====================================================
   // LAST SCAN TIME
@@ -165,97 +128,59 @@ function QRCodeDashboard({
       return "No scans yet";
     }
 
-    const scanDate = new Date(
-      lastScan.scannedAt,
-    );
+    const scanDate = new Date(lastScan.scannedAt);
 
     const now = new Date();
 
-    const differenceInSeconds =
-      Math.floor(
-        (now - scanDate) /
-          1000,
-      );
+    const differenceInSeconds = Math.floor((now - scanDate) / 1000);
 
-    if (
-      differenceInSeconds <
-      60
-    ) {
+    if (differenceInSeconds < 60) {
       return `${differenceInSeconds} sec${
-        differenceInSeconds !==
-        1
-          ? "s"
-          : ""
+        differenceInSeconds !== 1 ? "s" : ""
       } ago`;
     }
 
-    const minutes =
-      Math.floor(
-        differenceInSeconds /
-          60,
-      );
+    const minutes = Math.floor(differenceInSeconds / 60);
 
     if (minutes < 60) {
-      return `${minutes} min${
-        minutes !== 1
-          ? "s"
-          : ""
-      } ago`;
+      return `${minutes} min${minutes !== 1 ? "s" : ""} ago`;
     }
 
-    const hours =
-      Math.floor(
-        minutes / 60,
-      );
+    const hours = Math.floor(minutes / 60);
 
     if (hours < 24) {
-      return `${hours} hour${
-        hours !== 1
-          ? "s"
-          : ""
-      } ago`;
+      return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
     }
 
-    const days =
-      Math.floor(
-        hours / 24,
-      );
+    const days = Math.floor(hours / 24);
 
-    return `${days} day${
-      days !== 1
-        ? "s"
-        : ""
-    } ago`;
+    return `${days} day${days !== 1 ? "s" : ""} ago`;
   };
 
   // =====================================================
   // LAST SCANNED DOCTOR
   // =====================================================
 
-  const getLastScannedDoctor =
-    () => {
-      const doctor =
-        lastScan?.doctor;
+  const getLastScannedDoctor = () => {
+    const doctor = lastScan?.doctor;
 
-      if (!doctor) {
-        return "No scans yet";
-      }
+    if (!doctor) {
+      return "No scans yet";
+    }
 
-      if (doctor.city) {
-        return `${doctor.name} - ${doctor.city}`;
-      }
+    if (doctor.city) {
+      return `${doctor.name} - ${doctor.city}`;
+    }
 
-      return doctor.name;
-    };
+    return doctor.name;
+  };
 
   // =====================================================
   // OPEN MODAL
   // =====================================================
 
   const handleOpenModal = () => {
-    setShowGenerateModal(
-      true,
-    );
+    setShowGenerateModal(true);
 
     setDoctorSearch("");
 
@@ -273,9 +198,7 @@ function QRCodeDashboard({
   // =====================================================
 
   const handleCloseModal = () => {
-    setShowGenerateModal(
-      false,
-    );
+    setShowGenerateModal(false);
 
     setDoctorSearch("");
 
@@ -292,12 +215,8 @@ function QRCodeDashboard({
   // SELECT DOCTOR
   // =====================================================
 
-  const handleSelectDoctor = (
-    doctor,
-  ) => {
-    setSelectedDoctor(
-      doctor,
-    );
+  const handleSelectDoctor = (doctor) => {
+    setSelectedDoctor(doctor);
 
     setDoctorSearch("");
   };
@@ -306,268 +225,145 @@ function QRCodeDashboard({
   // GENERATE QR
   // =====================================================
 
-  const handleGenerateQR =
-    async () => {
-      if (!selectedDoctor) {
-        alert(
-          "Please select a doctor.",
-        );
+  const handleGenerateQR = async () => {
+    if (!selectedDoctor) {
+      alert("Please select a doctor.");
 
-        return;
-      }
+      return;
+    }
 
-      if (!selectedCampaign) {
-        alert(
-          "Please select a campaign.",
-        );
+    if (!selectedCampaign) {
+      alert("Please select a campaign.");
 
-        return;
-      }
+      return;
+    }
 
-      try {
-        await onGenerateQR?.({
-          doctorId:
-            selectedDoctor.doctorId ||
-            selectedDoctor._id,
+    try {
+      await onGenerateQR?.({
+        doctorId: selectedDoctor.doctorId || selectedDoctor._id,
 
-          campaignId:
-            selectedCampaign,
+        campaignId: selectedCampaign,
 
-          videoUrl:
-            videoUrl.trim() ||
-            null,
-        });
+        videoUrl: videoUrl.trim() || null,
+      });
 
-        handleCloseModal();
-      } catch (error) {
-        console.error(
-          "Generate QR Error:",
-          error,
-        );
-      }
-    };
+      handleCloseModal();
+    } catch (error) {
+      console.error("Generate QR Error:", error);
+    }
+  };
 
   // =====================================================
   // EXPORT DOCTORS
   // =====================================================
 
-  const handleExportDoctors =
-    async () => {
-      try {
-        setExporting(true);
+  const handleExportDoctors = async () => {
+    try {
+      setExporting(true);
 
-        console.log(
-          "Starting doctors Excel export...",
-        );
+      console.log("Starting doctors Excel export...");
 
-        let allDoctors = [];
+      let allDoctors = [];
 
-        if (
-          onFetchExportDoctors
-        ) {
-          const fetchedDoctors =
-            await onFetchExportDoctors();
+      if (onFetchExportDoctors) {
+        const fetchedDoctors = await onFetchExportDoctors();
 
-          if (
-            Array.isArray(
-              fetchedDoctors,
-            )
-          ) {
-            allDoctors =
-              fetchedDoctors;
-          }
+        if (Array.isArray(fetchedDoctors)) {
+          allDoctors = fetchedDoctors;
         }
-
-        if (
-          allDoctors.length ===
-            0 &&
-          exportDoctors.length >
-            0
-        ) {
-          allDoctors =
-            exportDoctors;
-        }
-
-        console.log(
-          "Doctors received for export:",
-          allDoctors.length,
-        );
-
-        if (
-          allDoctors.length ===
-          0
-        ) {
-          alert(
-            "No doctors found to export.",
-          );
-
-          return;
-        }
-
-        const excelData =
-          allDoctors.map(
-            (
-              doctor,
-              index,
-            ) => {
-              const campaign =
-                doctor.campaign ||
-                {};
-
-              const mr =
-                doctor.mr || {};
-
-              return {
-                "Sr. No.":
-                  index + 1,
-
-                "Doctor ID":
-                  doctor.doctorId ||
-                  doctor._id ||
-                  "",
-
-                "Doctor Name":
-                  doctor.name ||
-                  "",
-
-                Specialty:
-                  doctor.specialty ||
-                  "",
-
-                Clinic:
-                  doctor.clinic ||
-                  "",
-
-                City:
-                  doctor.city ||
-                  "",
-
-                Status:
-                  doctor.status ||
-                  "",
-
-                Campaign:
-                  typeof campaign ===
-                  "object"
-                    ? campaign.name ||
-                      ""
-                    : campaign ||
-                      "",
-
-                "Therapy Area":
-                  typeof campaign ===
-                  "object"
-                    ? campaign.therapyArea ||
-                      ""
-                    : "",
-
-                Brand:
-                  typeof campaign ===
-                  "object"
-                    ? campaign.brand ||
-                      ""
-                    : "",
-
-                "MR Name":
-                  typeof mr ===
-                  "object"
-                    ? mr.mrName ||
-                      ""
-                    : "",
-
-                "MR ID":
-                  typeof mr ===
-                  "object"
-                    ? mr.mrId ||
-                      ""
-                    : mr || "",
-
-                HQ:
-                  typeof mr ===
-                  "object"
-                    ? mr.HQ ||
-                      ""
-                    : "",
-
-                "Created At":
-                  doctor.createdAt
-                    ? new Date(
-                        doctor.createdAt,
-                      ).toLocaleString(
-                        "en-IN",
-                      )
-                    : "",
-
-                "Updated At":
-                  doctor.updatedAt
-                    ? new Date(
-                        doctor.updatedAt,
-                      ).toLocaleString(
-                        "en-IN",
-                      )
-                    : "",
-              };
-            },
-          );
-
-        const worksheet =
-          XLSX.utils.json_to_sheet(
-            excelData,
-          );
-
-        worksheet[
-          "!cols"
-        ] = [
-          { wch: 8 },
-          { wch: 24 },
-          { wch: 25 },
-          { wch: 20 },
-          { wch: 28 },
-          { wch: 18 },
-          { wch: 15 },
-          { wch: 25 },
-          { wch: 25 },
-          { wch: 20 },
-          { wch: 22 },
-          { wch: 18 },
-          { wch: 20 },
-          { wch: 24 },
-          { wch: 24 },
-        ];
-
-        const workbook =
-          XLSX.utils.book_new();
-
-        XLSX.utils.book_append_sheet(
-          workbook,
-          worksheet,
-          "Doctors",
-        );
-
-        const today =
-          new Date()
-            .toISOString()
-            .split(
-              "T",
-            )[0];
-
-        XLSX.writeFile(
-          workbook,
-          `Doctors_Export_${today}.xlsx`,
-        );
-      } catch (error) {
-        console.error(
-          "Excel Export Error:",
-          error,
-        );
-
-        alert(
-          "Failed to export doctors.",
-        );
-      } finally {
-        setExporting(false);
       }
-    };
+
+      if (allDoctors.length === 0 && exportDoctors.length > 0) {
+        allDoctors = exportDoctors;
+      }
+
+      console.log("Doctors received for export:", allDoctors.length);
+
+      if (allDoctors.length === 0) {
+        alert("No doctors found to export.");
+
+        return;
+      }
+
+      const excelData = allDoctors.map((doctor, index) => {
+        const campaign = doctor.campaign || {};
+
+        const mr = doctor.mr || {};
+
+        return {
+          "Sr. No.": index + 1,
+
+          "Doctor ID": doctor.doctorId || doctor._id || "",
+
+          "Doctor Name": doctor.name || "",
+
+          Specialty: doctor.specialty || "",
+
+          Clinic: doctor.clinic || "",
+
+          City: doctor.city || "",
+
+          Status: doctor.status || "",
+
+          Campaign:
+            typeof campaign === "object" ? campaign.name || "" : campaign || "",
+
+          "Therapy Area":
+            typeof campaign === "object" ? campaign.therapyArea || "" : "",
+
+          Brand: typeof campaign === "object" ? campaign.brand || "" : "",
+
+          "MR Name": typeof mr === "object" ? mr.mrName || "" : "",
+
+          "MR ID": typeof mr === "object" ? mr.mrId || "" : mr || "",
+
+          HQ: typeof mr === "object" ? mr.HQ || "" : "",
+
+          "Created At": doctor.createdAt
+            ? new Date(doctor.createdAt).toLocaleString("en-IN")
+            : "",
+
+          "Updated At": doctor.updatedAt
+            ? new Date(doctor.updatedAt).toLocaleString("en-IN")
+            : "",
+        };
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+      worksheet["!cols"] = [
+        { wch: 8 },
+        { wch: 24 },
+        { wch: 25 },
+        { wch: 20 },
+        { wch: 28 },
+        { wch: 18 },
+        { wch: 15 },
+        { wch: 25 },
+        { wch: 25 },
+        { wch: 20 },
+        { wch: 22 },
+        { wch: 18 },
+        { wch: 20 },
+        { wch: 24 },
+        { wch: 24 },
+      ];
+
+      const workbook = XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Doctors");
+
+      const today = new Date().toISOString().split("T")[0];
+
+      XLSX.writeFile(workbook, `Doctors_Export_${today}.xlsx`);
+    } catch (error) {
+      console.error("Excel Export Error:", error);
+
+      alert("Failed to export doctors.");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   // =====================================================
   // STATS
@@ -575,79 +371,48 @@ function QRCodeDashboard({
 
   const stats = [
     {
-      title:
-        "Total QR Codes",
-      value:
-        formatNumber(
-          totalQRCodes,
-        ),
+      title: "Total QR Codes",
+      value: formatNumber(totalQRCodes),
       icon: QrCode,
-      iconBg:
-        "bg-purple-100",
-      iconColor:
-        "text-purple-600",
-      bottom:
-        "Generated QR codes",
+      iconBg: "bg-purple-100",
+      iconColor: "text-purple-600",
+      bottom: "Generated QR codes",
     },
 
     {
-      title:
-        "Total Scans",
-      value:
-        formatNumber(
-          totalScans,
-        ),
+      title: "Total Scans",
+      value: formatNumber(totalScans),
       icon: TrendingUp,
-      iconBg:
-        "bg-blue-100",
-      iconColor:
-        "text-blue-600",
-      bottom:
-        "All QR scans",
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600",
+      bottom: "All QR scans",
     },
 
     {
-      title:
-        "Unique Scans",
-      value:
-        formatNumber(
-          uniqueScans,
-        ),
+      title: "Unique Scans",
+      value: formatNumber(uniqueScans),
       icon: Users,
-      iconBg:
-        "bg-purple-100",
-      iconColor:
-        "text-purple-600",
-      bottom:
-        "Unique visitors",
+      iconBg: "bg-purple-100",
+      iconColor: "text-purple-600",
+      bottom: "Unique visitors",
     },
 
     {
-      title:
-        "Avg. Scans / QR",
-      value:
-        averageScansPerQR,
+      title: "Avg. Scans / QR",
+      value: averageScansPerQR,
       icon: RotateCcw,
-      iconBg:
-        "bg-red-100",
-      iconColor:
-        "text-red-500",
-      bottom:
-        "Total scans ÷ QR codes",
+      iconBg: "bg-red-100",
+      iconColor: "text-red-500",
+      bottom: "Total scans ÷ QR codes",
     },
 
     {
-      title:
-        "Last Scan",
-      value:
-        getLastScanTime(),
+      title: "Last Scan",
+      value: getLastScanTime(),
       icon: Clock,
-      iconBg:
-        "bg-red-100",
-      iconColor:
-        "text-red-500",
-      bottom:
-        getLastScannedDoctor(),
+      iconBg: "bg-red-100",
+      iconColor: "text-red-500",
+      bottom: getLastScannedDoctor(),
     },
   ];
 
@@ -671,9 +436,7 @@ function QRCodeDashboard({
             </h1>
 
             <p className="mt-1 text-[11px] text-gray-500">
-              Manage QR codes,
-              generate new codes
-              and export doctors.
+              Manage QR codes, generate new codes and export doctors.
             </p>
           </div>
 
@@ -682,12 +445,8 @@ function QRCodeDashboard({
 
             <button
               type="button"
-              onClick={
-                handleExportDoctors
-              }
-              disabled={
-                exporting
-              }
+              onClick={handleExportDoctors}
+              disabled={exporting}
               className="
                 flex
                 h-10
@@ -706,13 +465,9 @@ function QRCodeDashboard({
                 disabled:opacity-60
               "
             >
-              <Download
-                size={16}
-              />
+              <Download size={16} />
 
-              {exporting
-                ? "Exporting..."
-                : "Export Doctors"}
+              {exporting ? "Exporting..." : "Export Doctors"}
             </button>
 
             {/* BULK */}
@@ -736,10 +491,7 @@ function QRCodeDashboard({
                 hover:bg-purple-50
               "
             >
-              <Users
-                size={16}
-              />
-
+              <Users size={16} />
               Bulk Generate QR
             </button>
 
@@ -747,9 +499,7 @@ function QRCodeDashboard({
 
             <button
               type="button"
-              onClick={
-                handleOpenModal
-              }
+              onClick={handleOpenModal}
               className="
                 flex
                 h-10
@@ -769,10 +519,7 @@ function QRCodeDashboard({
                 hover:to-violet-700
               "
             >
-              <Plus
-                size={17}
-              />
-
+              <Plus size={17} />
               Generate QR Code
             </button>
           </div>
@@ -783,79 +530,65 @@ function QRCodeDashboard({
         <div
           className="
             grid
-            min-h-[230px]
-            grid-cols-2
-            auto-rows-[110px]
+            grid-cols-1
             gap-3
+            sm:grid-cols-2
+            lg:grid-cols-5
           "
         >
-          {stats.map(
-            (
-              stat,
-              index,
-            ) => {
-              const Icon =
-                stat.icon;
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
 
-              return (
-                <div
-                  key={index}
-                  className="
-                    h-[110px]
-                    min-h-[110px]
-                    overflow-hidden
-                    rounded-lg
-                    border
-                    border-gray-200
-                    bg-white
-                    px-4
-                    py-3
-                    shadow-sm
-                  "
-                >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={`
-                        flex
-                        h-10
-                        w-10
-                        shrink-0
-                        items-center
-                        justify-center
-                        rounded-lg
-                        ${stat.iconBg}
-                        ${stat.iconColor}
-                      `}
-                    >
-                      <Icon
-                        size={19}
-                      />
-                    </div>
-
-                    <div className="min-w-0">
-                      <p className="truncate text-[11px] text-gray-500">
-                        {
-                          stat.title
-                        }
-                      </p>
-
-                      <h2 className="mt-1 truncate text-[19px] font-semibold text-[#17203a]">
-                        {
-                          stat.value
-                        }
-                      </h2>
-                    </div>
+            return (
+              <div
+                key={index}
+                className="
+                  h-[110px]
+                  min-h-[110px]
+                  overflow-hidden
+                  rounded-lg
+                  border
+                  border-gray-200
+                  bg-white
+                  px-4
+                  py-3
+                  shadow-sm
+                "
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className={`
+                      flex
+                      h-10
+                      w-10
+                      shrink-0
+                      items-center
+                      justify-center
+                      rounded-lg
+                      ${stat.iconBg}
+                      ${stat.iconColor}
+                    `}
+                  >
+                    <Icon size={19} />
                   </div>
 
-                  <p className="mt-5 truncate text-[11px] text-gray-500">
-                    {
-                      stat.bottom
-                    }
-                  </p>
+                  <div className="min-w-0">
+                    <p className="truncate text-[11px] text-gray-500">
+                      {stat.title}
+                    </p>
+
+                    <h2 className="mt-1 truncate text-[19px] font-semibold text-[#17203a]">
+                      {stat.value}
+                    </h2>
+                  </div>
                 </div>
-              );
-            },
-          )}
+
+                <p className="mt-5 truncate text-[11px] text-gray-500">
+                  {stat.bottom}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -908,21 +641,17 @@ function QRCodeDashboard({
             >
               <div>
                 <h2 className="text-base font-semibold text-[#17203a]">
-                  Generate QR
-                  Code
+                  Generate QR Code
                 </h2>
 
                 <p className="mt-1 text-[10px] text-gray-400">
-                  Select a doctor
-                  and campaign.
+                  Select a doctor and campaign.
                 </p>
               </div>
 
               <button
                 type="button"
-                onClick={
-                  handleCloseModal
-                }
+                onClick={handleCloseModal}
                 className="
                   rounded-lg
                   p-2
@@ -930,9 +659,7 @@ function QRCodeDashboard({
                   hover:bg-gray-100
                 "
               >
-                <X
-                  size={18}
-                />
+                <X size={18} />
               </button>
             </div>
 
@@ -969,17 +696,8 @@ function QRCodeDashboard({
 
                     <input
                       type="text"
-                      value={
-                        doctorSearch
-                      }
-                      onChange={(
-                        e,
-                      ) =>
-                        setDoctorSearch(
-                          e.target
-                            .value,
-                        )
-                      }
+                      value={doctorSearch}
+                      onChange={(e) => setDoctorSearch(e.target.value)}
                       placeholder="Search doctor..."
                       className="
                         h-10
@@ -1011,113 +729,82 @@ function QRCodeDashboard({
                   >
                     <div className="grid grid-cols-2 gap-3">
                       {doctorsLoading ? (
-                        [1, 2, 3, 4].map(
-                          (
-                            item,
-                          ) => (
+                        [1, 2, 3, 4].map((item) => (
+                          <div
+                            key={item}
+                            className="
+                              h-[76px]
+                              animate-pulse
+                              rounded-xl
+                              border
+                              border-gray-200
+                              bg-gray-50
+                            "
+                          />
+                        ))
+                      ) : doctors.length > 0 ? (
+                        doctors.map((doctor) => (
+                          <button
+                            type="button"
+                            key={doctor._id || doctor.doctorId}
+                            onClick={() => handleSelectDoctor(doctor)}
+                            className="
+                              flex
+                              h-[76px]
+                              items-center
+                              gap-3
+                              rounded-xl
+                              border
+                              border-gray-200
+                              bg-white
+                              p-3
+                              text-left
+                              transition
+                              hover:border-purple-300
+                              hover:bg-purple-50
+                            "
+                          >
                             <div
-                              key={
-                                item
-                              }
-                              className="
-                                h-[76px]
-                                animate-pulse
-                                rounded-xl
-                                border
-                                border-gray-200
-                                bg-gray-50
-                              "
-                            />
-                          ),
-                        )
-                      ) : doctors.length >
-                        0 ? (
-                        doctors.map(
-                          (
-                            doctor,
-                          ) => (
-                            <button
-                              type="button"
-                              key={
-                                doctor._id ||
-                                doctor.doctorId
-                              }
-                              onClick={() =>
-                                handleSelectDoctor(
-                                  doctor,
-                                )
-                              }
                               className="
                                 flex
-                                h-[76px]
+                                h-10
+                                w-10
+                                shrink-0
                                 items-center
-                                gap-3
-                                rounded-xl
-                                border
-                                border-gray-200
-                                bg-white
-                                p-3
-                                text-left
-                                transition
-                                hover:border-purple-300
-                                hover:bg-purple-50
+                                justify-center
+                                rounded-full
+                                bg-purple-100
+                                text-[12px]
+                                font-semibold
+                                text-purple-600
                               "
                             >
-                              <div
-                                className="
-                                  flex
-                                  h-10
-                                  w-10
-                                  shrink-0
-                                  items-center
-                                  justify-center
-                                  rounded-full
-                                  bg-purple-100
-                                  text-[12px]
-                                  font-semibold
-                                  text-purple-600
-                                "
-                              >
-                                {doctor.name
-                                  ?.charAt(
-                                    0,
-                                  )
-                                  ?.toUpperCase() ||
-                                  "D"}
-                              </div>
+                              {doctor.name?.charAt(0)?.toUpperCase() || "D"}
+                            </div>
 
-                              <div className="min-w-0 flex-1">
-                                <p className="truncate text-[11px] font-semibold text-gray-800">
-                                  {
-                                    doctor.name
-                                  }
-                                </p>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-[11px] font-semibold text-gray-800">
+                                {doctor.name}
+                              </p>
 
-                                <p className="mt-1 truncate text-[10px] text-gray-400">
-                                  {doctor.specialty ||
-                                    "No specialty"}
+                              <p className="mt-1 truncate text-[10px] text-gray-400">
+                                {doctor.specialty || "No specialty"}
 
-                                  {doctor.city
-                                    ? ` • ${doctor.city}`
-                                    : ""}
-                                </p>
-                              </div>
-                            </button>
-                          ),
-                        )
+                                {doctor.city ? ` • ${doctor.city}` : ""}
+                              </p>
+                            </div>
+                          </button>
+                        ))
                       ) : (
                         <div className="col-span-2 flex h-[330px] items-center justify-center">
                           <div className="text-center">
                             <Users
-                              size={
-                                24
-                              }
+                              size={24}
                               className="mx-auto text-gray-300"
                             />
 
                             <p className="mt-2 text-[12px] text-gray-500">
-                              No doctors
-                              found
+                              No doctors found
                             </p>
                           </div>
                         </div>
@@ -1138,24 +825,16 @@ function QRCodeDashboard({
                   <div className="flex items-center justify-between rounded-xl border border-purple-200 bg-purple-50 p-3">
                     <div className="flex min-w-0 items-center gap-3">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-[12px] font-semibold text-purple-600">
-                        {selectedDoctor.name
-                          ?.charAt(
-                            0,
-                          )
-                          ?.toUpperCase() ||
-                          "D"}
+                        {selectedDoctor.name?.charAt(0)?.toUpperCase() || "D"}
                       </div>
 
                       <div className="min-w-0">
                         <p className="truncate text-[12px] font-semibold text-gray-800">
-                          {
-                            selectedDoctor.name
-                          }
+                          {selectedDoctor.name}
                         </p>
 
                         <p className="truncate text-[10px] text-gray-500">
-                          {selectedDoctor.specialty ||
-                            "Doctor"}
+                          {selectedDoctor.specialty || "Doctor"}
 
                           {selectedDoctor.city
                             ? ` • ${selectedDoctor.city}`
@@ -1166,11 +845,7 @@ function QRCodeDashboard({
 
                     <button
                       type="button"
-                      onClick={() =>
-                        setSelectedDoctor(
-                          null,
-                        )
-                      }
+                      onClick={() => setSelectedDoctor(null)}
                       className="text-[11px] font-medium text-purple-600"
                     >
                       Change
@@ -1187,14 +862,7 @@ function QRCodeDashboard({
                     <div className="relative">
                       <button
                         type="button"
-                        onClick={() =>
-                          setShowCampaigns(
-                            (
-                              prev,
-                            ) =>
-                              !prev,
-                          )
-                        }
+                        onClick={() => setShowCampaigns((prev) => !prev)}
                         className="
                           flex
                           h-10
@@ -1214,22 +882,12 @@ function QRCodeDashboard({
                         <span>
                           {selectedCampaign
                             ? campaigns.find(
-                                (
-                                  campaign,
-                                ) =>
-                                  campaign._id ===
-                                  selectedCampaign,
-                              )
-                                ?.name ||
-                              "Campaign selected"
+                                (campaign) => campaign._id === selectedCampaign,
+                              )?.name || "Campaign selected"
                             : "Select campaign"}
                         </span>
 
-                        <ChevronDown
-                          size={
-                            15
-                          }
-                        />
+                        <ChevronDown size={15} />
                       </button>
 
                       {showCampaigns && (
@@ -1253,64 +911,44 @@ function QRCodeDashboard({
                         >
                           {campaignsLoading ? (
                             <div className="px-3 py-3 text-center text-[11px] text-gray-400">
-                              Loading
-                              campaigns...
+                              Loading campaigns...
                             </div>
-                          ) : campaigns.length >
-                            0 ? (
-                            campaigns.map(
-                              (
-                                campaign,
-                              ) => (
-                                <button
-                                  type="button"
-                                  key={
-                                    campaign._id
-                                  }
-                                  onClick={() => {
-                                    setSelectedCampaign(
-                                      campaign._id,
-                                    );
+                          ) : campaigns.length > 0 ? (
+                            campaigns.map((campaign) => (
+                              <button
+                                type="button"
+                                key={campaign._id}
+                                onClick={() => {
+                                  setSelectedCampaign(campaign._id);
 
-                                    setShowCampaigns(
-                                      false,
-                                    );
-                                  }}
-                                  className="
-                                    flex
-                                    w-full
-                                    items-center
-                                    justify-between
-                                    rounded-md
-                                    px-3
-                                    py-2.5
-                                    text-left
-                                    text-[11px]
-                                    hover:bg-purple-50
-                                  "
-                                >
-                                  <span>
-                                    {
-                                      campaign.name
-                                    }
-                                  </span>
+                                  setShowCampaigns(false);
+                                }}
+                                className="
+                                  flex
+                                  w-full
+                                  items-center
+                                  justify-between
+                                  rounded-md
+                                  px-3
+                                  py-2.5
+                                  text-left
+                                  text-[11px]
+                                  hover:bg-purple-50
+                                "
+                              >
+                                <span>{campaign.name}</span>
 
-                                  {selectedCampaign ===
-                                    campaign._id && (
-                                    <Check
-                                      size={
-                                        14
-                                      }
-                                      className="text-purple-600"
-                                    />
-                                  )}
-                                </button>
-                              ),
-                            )
+                                {selectedCampaign === campaign._id && (
+                                  <Check
+                                    size={14}
+                                    className="text-purple-600"
+                                  />
+                                )}
+                              </button>
+                            ))
                           ) : (
                             <div className="px-3 py-3 text-center text-[11px] text-gray-400">
-                              No campaigns
-                              found
+                              No campaigns found
                             </div>
                           )}
                         </div>
@@ -1327,17 +965,8 @@ function QRCodeDashboard({
 
                     <input
                       type="url"
-                      value={
-                        videoUrl
-                      }
-                      onChange={(
-                        e,
-                      ) =>
-                        setVideoUrl(
-                          e.target
-                            .value,
-                        )
-                      }
+                      value={videoUrl}
+                      onChange={(e) => setVideoUrl(e.target.value)}
                       placeholder="https://example.com/video"
                       className="
                         h-10
@@ -1375,9 +1004,7 @@ function QRCodeDashboard({
             >
               <button
                 type="button"
-                onClick={
-                  handleCloseModal
-                }
+                onClick={handleCloseModal}
                 className="
                   rounded-lg
                   border
@@ -1396,13 +1023,8 @@ function QRCodeDashboard({
 
               <button
                 type="button"
-                disabled={
-                  !selectedDoctor ||
-                  !selectedCampaign
-                }
-                onClick={
-                  handleGenerateQR
-                }
+                disabled={!selectedDoctor || !selectedCampaign}
+                onClick={handleGenerateQR}
                 className="
                   flex
                   items-center
@@ -1421,10 +1043,7 @@ function QRCodeDashboard({
                   disabled:opacity-50
                 "
               >
-                <QrCode
-                  size={16}
-                />
-
+                <QrCode size={16} />
                 Generate QR
               </button>
             </div>

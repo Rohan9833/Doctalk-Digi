@@ -18,12 +18,17 @@ const analyticsRoutes = require("./Route/Analyticsroutes");
 const QrcodeRoutes = require("./Route/QrcodeRoutes");
 const mrRoutes = require("./Route/MrRoute");
 const UserRoutes = require("./Route/UserRoute.js");
+const {trackQrScan} = require("./Controller/Qrcodecontroller.js")
 
 
 connectDB();
 
 app.use(cors({
-  origin: true,
+  origin: [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "https://duplex-slate-kilobyte.ngrok-free.dev",
+    ],
   credentials: true,
 }));
 
@@ -45,12 +50,12 @@ app.use("/api/qrcode", QrcodeRoutes);
 app.use("/api/mr", mrRoutes);
 app.use("/api/user", UserRoutes);
 
-
+app.get("/q/:shortCode", trackQrScan);
 app.get("/", (req, res) => {
   res.send("Welcome to the Doctalk Admin API");
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT,"0.0.0.0" ,() => {
   console.log(`Server is running on port ${PORT}`);
 });
