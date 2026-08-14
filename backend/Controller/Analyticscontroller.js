@@ -32,110 +32,326 @@ const getDateRange = (range) => {
 const getDashboardStats = async (req, res) => {
   try {
     const { range = "7d", campaign } = req.query;
+
     const { start, end } = getDateRange(range);
 
-    // ── Build campaign filter for scoped views ────────────
-    const campFilter = campaign ? { campaign } : {};
+    // =====================================================
+    // CAMPAIGN FILTER
+    // =====================================================
+
+    const campFilter = campaign
+      ? { campaign }
+      : {};
+
+    // =====================================================
+    // PREVIOUS PERIOD
+    // =====================================================
+
+    const previousStart = new Date(
+      start.getTime() - (end - start)
+    );
+
+    const previousEnd = start;
+
+    // =====================================================
+    // DASHBOARD QUERIES
+    // =====================================================
 
     const [
+      // Doctors
       totalDoctors,
       activeDoctorPages,
+
+      // QR
       totalScans,
+
+      // Quiz
       quizStarts,
       quizCompletions,
+
+      // Average quiz score
       avgScoreAgg,
-      // Trend comparison (previous period)
+
+      // Previous period - QR
       prevScans,
+
+      // Previous period - Quiz
       prevStarts,
       prevCompletions,
     ] = await Promise.all([
-      Doctor.countDocuments({ ...campFilter }),
-      Doctor.countDocuments({ ...campFilter, pageStatus: "published" }),
+
+      // ===================================================
+      // TOTAL DOCTORS
+      // ===================================================
+
+      Doctor.countDocuments({
+        ...campFilter,
+      }),
+
+      // ===================================================
+      // ACTIVE DOCTOR PAGES
+      // ===================================================
+
+      Doctor.countDocuments({
+        ...campFilter,
+        pageStatus: "published",
+      }),
+
+      // ===================================================
+      // TOTAL QR SCANS
+      // ===================================================
 
       QRScan.countDocuments({
         ...campFilter,
-        scannedAt: { $gte: start, $lte: end },
+        scannedAt: {
+          $gte: start,
+          $lte: end,
+        },
       }),
+
+      // ===================================================
+      // QUIZ STARTS
+      //
+      // Every QuizAttempt means a quiz was started.
+      // ===================================================
+
       QuizAttempt.countDocuments({
         ...campFilter,
-        startedAt: { $gte: start, $lte: end },
+        startedAt: {
+          $gte: start,
+          $lte: end,
+        },
       }),
+
+      // ===================================================
+      // QUIZ COMPLETIONS
+      //
+      // Only completed attempts are counted.
+      // ===================================================
+
       QuizAttempt.countDocuments({
         ...campFilter,
         status: "completed",
-        completedAt: { $gte: start, $lte: end },
+        completedAt: {
+          $gte: start,
+          $lte: end,
+        },
       }),
+
+      // ===================================================
+      // AVERAGE QUIZ SCORE
+      //
+      // score = number of correct answers
+      // totalQuestions = total questions
+      //
+      // Example:
+      // score = 4
+      // totalQuestions = 5
+      //
+      // percentage = 80%
+      // ===================================================
 
       QuizAttempt.aggregate([
         {
           $match: {
             ...campFilter,
+
             status: "completed",
-            completedAt: { $gte: start, $lte: end },
+
+            completedAt: {
+              $gte: start,
+              $lte: end,
+            },
           },
         },
+
+        {
+          $project: {
+            percentage: {
+              $cond: [
+                {
+                  $gt: [
+                    "$totalQuestions",
+                    0,
+                  ],
+                },
+
+                {
+                  $multiply: [
+                    {
+                      $divide: [
+                        "$score",
+                        "$totalQuestions",
+                      ],
+                    },
+                    100,
+                  ],
+                },
+
+                0,
+              ],
+            },
+          },
+        },
+
         {
           $group: {
             _id: null,
-            avg: { $avg: "$score" },
-            total: { $first: "$totalQuestions" },
+
+            avgScore: {
+              $avg: "$percentage",
+            },
           },
         },
       ]),
 
-      // Previous period for trend %
+      // ===================================================
+      // PREVIOUS PERIOD QR SCANS
+      // ===================================================
+
       QRScan.countDocuments({
         ...campFilter,
+
         scannedAt: {
-          $gte: new Date(start.getTime() - (end - start)),
-          $lte: start,
+          $gte: previousStart,
+          $lte: previousEnd,
         },
       }),
+
+      // ===================================================
+      // PREVIOUS PERIOD QUIZ STARTS
+      // ===================================================
+
       QuizAttempt.countDocuments({
         ...campFilter,
+
         startedAt: {
-          $gte: new Date(start.getTime() - (end - start)),
-          $lte: start,
+          $gte: previousStart,
+          $lte: previousEnd,
         },
       }),
+
+      // ===================================================
+      // PREVIOUS PERIOD QUIZ COMPLETIONS
+      // ===================================================
+
       QuizAttempt.countDocuments({
         ...campFilter,
+
         status: "completed",
+
         completedAt: {
-          $gte: new Date(start.getTime() - (end - start)),
-          $lte: start,
+          $gte: previousStart,
+          $lte: previousEnd,
         },
       }),
     ]);
 
-    const avgAgg = avgScoreAgg[0] || {};
-    const maxScore = avgAgg.total || 5;
-    const avgPct = avgAgg.avg ? +((avgAgg.avg / maxScore) * 100).toFixed(1) : 0;
+    // =====================================================
+    // AVERAGE QUIZ SCORE
+    // =====================================================
 
-    const trend = (curr, prev) =>
-      prev > 0 ? +(((curr - prev) / prev) * 100).toFixed(1) : null;
+    const avgScore =
+      avgScoreAgg.length > 0
+        ? Number(
+            avgScoreAgg[0].avgScore.toFixed(1)
+          )
+        : 0;
+
+    // =====================================================
+    // TREND CALCULATION
+    // =====================================================
+
+    const trend = (current, previous) => {
+      if (previous > 0) {
+        return Number(
+          (
+            ((current - previous) /
+              previous) *
+            100
+          ).toFixed(1)
+        );
+      }
+
+      return null;
+    };
+
+    // =====================================================
+    // DOCTOR PAGE STATS
+    // =====================================================
+
+    const draftDoctorPages =
+      totalDoctors - activeDoctorPages;
+
+    // =====================================================
+    // RESPONSE
+    // =====================================================
 
     res.status(200).json({
       success: true,
+
       data: {
+        // ===============================================
+        // DOCTORS
+        // ===============================================
+
         totalDoctors,
+
         activeDoctorPages,
-        draftDoctorPages: totalDoctors - activeDoctorPages,
+
+        draftDoctorPages,
+
+        // ===============================================
+        // QR
+        // ===============================================
+
         totalScans,
+
+        // ===============================================
+        // QUIZ
+        // ===============================================
+
         quizStarts,
+
         quizCompletions,
-        avgScore: avgPct,
+
+        avgQuizScore: avgScore,
+
+        // ===============================================
+        // TRENDS
+        // ===============================================
+
         trends: {
-          scans: trend(totalScans, prevScans),
-          quizStarts: trend(quizStarts, prevStarts),
-          completions: trend(quizCompletions, prevCompletions),
+          scans: trend(
+            totalScans,
+            prevScans
+          ),
+
+          quizStarts: trend(
+            quizStarts,
+            prevStarts
+          ),
+
+          completions: trend(
+            quizCompletions,
+            prevCompletions
+          ),
         },
       },
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error(
+      "Dashboard Stats Error:",
+      err
+    );
+
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
   }
 };
+
 
 // ════════════════════════════════════════════════
 // GET /api/analytics/activity

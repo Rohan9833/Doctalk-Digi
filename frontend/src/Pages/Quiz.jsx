@@ -24,78 +24,7 @@ function Quizzes() {
 
 
 
-  // ==========================================
-  // GET QUIZ DASHBOARD DATA
-  // ==========================================
 
-  // useEffect(() => {
-  //   const fetchQuizDashboard = async () => {
-  //     try {
-  //       setLoading(true);
-
-  //       const params = {
-  //         page,
-  //         limit,
-  //       };
-
-  //       // Search
-  //       if (search.trim()) {
-  //         params.search = search.trim();
-  //       }
-
-  //       // Therapy Area
-  //       if (therapyArea !== "All") {
-  //         params.therapyArea = therapyArea;
-  //       }
-
-  //       // Client
-  //       if (client !== "All") {
-  //         params.client = client;
-  //       }
-
-  //       // Status
-  //       if (status !== "All") {
-  //         params.status = status;
-  //       }
-
-  //       console.log("Quiz API Params:", params);
-
-  //       const response = await axios.get(
-  //         "/api/quizzes/dashboard",
-  //         {
-  //           params,
-  //         }
-  //       );
-
-  //       console.log(
-  //         "Quiz Dashboard Response:",
-  //         response.data
-  //       );
-
-  //       setQuizData(response.data);
-
-  //     } catch (error) {
-  //       console.error(
-  //         "Quiz Dashboard Error:",
-  //         error.response?.status,
-  //         error.response?.data || error.message
-  //       );
-
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchQuizDashboard();
-
-  // }, [
-  //   search,
-  //   therapyArea,
-  //   client,
-  //   status,
-  //   page,
-  //   limit,
-  // ]);
   useEffect(() => {
     const fetchQuizDashboard = async () => {
       try {

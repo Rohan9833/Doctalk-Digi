@@ -10,12 +10,14 @@ const {
   getCampaignStats,
   getCampaignDashBoardData,
   campaignSelector,
+  exportAllCampaigns
 } = require("../Controller/Campaigncontroller");
 
 router.get("/dashboard", getCampaignDashBoardData)
 router.post("/createCampaign", createCampaigns);
 router.get("/campaignList", campaignSelector)
 router.put("/:campaignId", updateCampaign)
+router.get("/export", exportAllCampaigns);
 router.use(protect);
 router.get("/", getAllCampaigns);
 router.get("/:id", getCampaignById);

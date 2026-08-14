@@ -2,11 +2,7 @@ import React from "react";
 import * as XLSX from "xlsx";
 
 function QuizHeader({ data, setShowForm }) {
-  console.log("QuizHeader Rendered");
-
-  const exportToExcel = ({ data }) => {
-    console.log("excel function hit hua hain");
-
+  const exportToExcel = () => {
     const quizzes = data?.quizTable || [];
 
     if (quizzes.length === 0) {
@@ -15,16 +11,18 @@ function QuizHeader({ data, setShowForm }) {
     }
 
     const excelData = quizzes.map((quiz) => ({
-      "Quiz ID": quiz.quizId,
-      "Quiz Name": quiz.quizName,
-      "Therapy Area": quiz.therapyArea,
-      Client: quiz.client,
-      Questions: quiz.question,
-      Version: quiz.version,
-      Status: quiz.status,
-      "Linked Campaign": quiz.linkedCampaign,
-      "Last Updated": new Date(quiz.lastUpdatedAt).toLocaleString("en-IN"),
-      Description: quiz.description,
+      "Quiz ID": quiz.quizId || "",
+      "Quiz Name": quiz.quizName || "",
+      "Therapy Area": quiz.therapyArea || "",
+      Client: quiz.client || "",
+      Questions: quiz.question || 0,
+      Version: quiz.version || "",
+      Status: quiz.status || "",
+      "Linked Campaign": quiz.linkedCampaign || "",
+      "Last Updated": quiz.lastUpdatedAt
+        ? new Date(quiz.lastUpdatedAt).toLocaleString("en-IN")
+        : "",
+      Description: quiz.description || "",
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(excelData);
@@ -41,6 +39,8 @@ function QuizHeader({ data, setShowForm }) {
 
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+      {/* HEADER */}
+
       <div>
         <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
           Quizzes
@@ -51,7 +51,11 @@ function QuizHeader({ data, setShowForm }) {
         </p>
       </div>
 
+      {/* ACTIONS */}
+
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
+        {/* EXPORT */}
+
         <button
           onClick={exportToExcel}
           className="border px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm hover:bg-gray-50"
@@ -59,9 +63,11 @@ function QuizHeader({ data, setShowForm }) {
           Export (Excel)
         </button>
 
+        {/* ADD QUIZ */}
+
         <button
           onClick={() => {
-            console.log("clicked");
+            console.log("Add quiz clicked");
             setShowForm(true);
           }}
           className="bg-indigo-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm hover:bg-indigo-700"

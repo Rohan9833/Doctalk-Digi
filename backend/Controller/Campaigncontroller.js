@@ -3,6 +3,7 @@ const Client = require("../Model/ClientModel");
 const Doctor = require("../Model/DoctorModel");
 const QRScan = require("../Model/QRScanModel");
 const QuizAttempt = require("../Model/QuizAttemptModel");
+const XLSX = require("xlsx");
 
 // ── helpers ───────────────────────────────────────────────
 const generateCampaignId = () =>
@@ -652,6 +653,219 @@ const campaignSelector = async (req, res) => {
 
 
 
+
+// =====================================================
+// EXPORT ACTIVE CAMPAIGNS TO EXCEL
+// =====================================================
+
+// =====================================================
+// EXPORT ALL CAMPAIGNS TO EXCEL
+// =====================================================
+
+const exportAllCampaigns = async (req, res) => {
+  try {
+    // =================================================
+    // GET ALL CAMPAIGNS
+    // =================================================
+
+    const campaigns = await Campaign.find({})
+      .populate("client")
+      .populate("quiz")
+      .populate("doctors")
+      .populate("createdBy")
+      .lean();
+
+    // =================================================
+    // CONVERT CAMPAIGNS TO EXCEL DATA
+    // =================================================
+
+    const excelData = campaigns.map((campaign) => ({
+      "Campaign ID": campaign.campaignId || "",
+
+      Name: campaign.name || "",
+
+      "Therapy Area": campaign.therapyArea || "",
+
+      Brand: campaign.brand || "",
+
+      Description: campaign.description || "",
+
+      Thumbnail: campaign.thumbnail || "",
+
+      "Start Date": campaign.startDate
+        ? new Date(campaign.startDate).toLocaleDateString()
+        : "",
+
+      "End Date": campaign.endDate
+        ? new Date(campaign.endDate).toLocaleDateString()
+        : "",
+
+      Status: campaign.status || "",
+
+      "Target Doctors": campaign.targetDoctors || 0,
+
+      // =================================================
+      // CLIENT
+      // =================================================
+
+      "Client ID": campaign.client?._id
+        ? campaign.client._id.toString()
+        : "",
+
+      "Client Name": campaign.client?.name || "",
+
+      "Client Email": campaign.client?.email || "",
+
+      // =================================================
+      // QUIZZES
+      // =================================================
+
+      "Quiz IDs": Array.isArray(campaign.quiz)
+        ? campaign.quiz
+            .map((quiz) =>
+              quiz?._id
+                ? quiz._id.toString()
+                : ""
+            )
+            .filter(Boolean)
+            .join(", ")
+        : "",
+
+      "Quiz Names": Array.isArray(campaign.quiz)
+        ? campaign.quiz
+            .map((quiz) => quiz?.name || "")
+            .filter(Boolean)
+            .join(", ")
+        : "",
+
+      // =================================================
+      // DOCTORS
+      // =================================================
+
+      "Doctor IDs": Array.isArray(campaign.doctors)
+        ? campaign.doctors
+            .map((doctor) =>
+              doctor?._id
+                ? doctor._id.toString()
+                : ""
+            )
+            .filter(Boolean)
+            .join(", ")
+        : "",
+
+      "Doctor Names": Array.isArray(campaign.doctors)
+        ? campaign.doctors
+            .map((doctor) => doctor?.name || "")
+            .filter(Boolean)
+            .join(", ")
+        : "",
+
+      // =================================================
+      // CREATED BY
+      // =================================================
+
+      "Created By ID": campaign.createdBy?._id
+        ? campaign.createdBy._id.toString()
+        : "",
+
+      "Created By Name":
+        campaign.createdBy?.name || "",
+
+      "Created By Email":
+        campaign.createdBy?.email || "",
+
+      // =================================================
+      // TIMESTAMPS
+      // =================================================
+
+      "Created At": campaign.createdAt
+        ? new Date(
+            campaign.createdAt
+          ).toLocaleString()
+        : "",
+
+      "Updated At": campaign.updatedAt
+        ? new Date(
+            campaign.updatedAt
+          ).toLocaleString()
+        : "",
+    }));
+
+    // =================================================
+    // CREATE WORKSHEET
+    // =================================================
+
+    const worksheet = XLSX.utils.json_to_sheet(
+      excelData
+    );
+
+    // =================================================
+    // COLUMN WIDTH
+    // =================================================
+
+    const columns = Object.keys(
+      excelData[0] || {}
+    );
+
+    worksheet["!cols"] = columns.map((column) => ({
+      wch: Math.min(
+        Math.max(column.length + 5, 15),
+        40
+      ),
+    }));
+
+    // =================================================
+    // CREATE WORKBOOK
+    // =================================================
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "All Campaigns"
+    );
+
+    // =================================================
+    // CREATE XLSX BUFFER
+    // =================================================
+
+    const excelBuffer = XLSX.write(workbook, {
+      type: "buffer",
+      bookType: "xlsx",
+    });
+
+    // =================================================
+    // DOWNLOAD FILE
+    // =================================================
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="all-campaigns.xlsx"'
+    );
+
+    return res.send(excelBuffer);
+  } catch (error) {
+    console.error(
+      "Export all campaigns error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to export campaigns",
+      error: error.message,
+    });
+  }
+};
+
+
+
 module.exports = {
   getAllCampaigns,
   getCampaignById,
@@ -661,5 +875,6 @@ module.exports = {
   getCampaignStats,
   getCampaignDashBoardData,
   createCampaigns,
-  campaignSelector
+  campaignSelector,
+  exportAllCampaigns
 };

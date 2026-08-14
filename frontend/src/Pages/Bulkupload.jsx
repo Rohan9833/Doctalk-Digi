@@ -23,9 +23,9 @@ function BulkUpload() {
         <h1 className="text-2xl font-semibold text-gray-800">
           Bulk Upload Doctors (Excel)
         </h1>
-        <p className="text-sm text-gray-500">
+        {/* <p className="text-sm text-gray-500">
           Dashboard &gt; Doctors &gt; Bulk Upload
-        </p>
+        </p> */}
       </div>
 
       <Stepper />
