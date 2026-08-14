@@ -36,8 +36,6 @@ const TABS = {
   DRAFT_PAGES: "Draft Pages",
 };
 
-
-
 //Reusable Cards Component
 
 const StatCard = ({ title, value, icon }) => {
@@ -162,12 +160,12 @@ export default function DoctorDashboard() {
       color: "text-violet-600",
     },
 
-    {
-      title: "Published Pages",
-      value: publishedPages || 0,
-      icon: FileCheck,
-      color: "text-green-600",
-    },
+    // {
+    //   title: "Published Pages",
+    //   value: publishedPages || 0,
+    //   icon: FileCheck,
+    //   color: "text-green-600",
+    // },
 
     {
       title: "Total Qr Codes",
@@ -176,12 +174,12 @@ export default function DoctorDashboard() {
       color: "text-orange-600",
     },
 
-    {
-      title: "Total Page Views",
-      value: statsData?.QuizAttempts || 0,
-      icon: Eye,
-      color: "text-blue-600",
-    },
+    // {
+    //   title: "Total Page Views",
+    //   value: statsData?.QuizAttempts || 0,
+    //   icon: Eye,
+    //   color: "text-blue-600",
+    // },
 
     {
       title: "Quiz Attempts",
@@ -359,7 +357,7 @@ export default function DoctorDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => {
           const Icon = s.icon;
 
@@ -741,8 +739,6 @@ export default function DoctorDashboard() {
             </div>
           </div>
         </div>
-
-
       </div>
 
       <ConfirmationModal

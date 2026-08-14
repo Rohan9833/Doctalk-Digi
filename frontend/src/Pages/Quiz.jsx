@@ -132,8 +132,8 @@ function Quizzes() {
         );
 
         console.log(
-          "API RESPONSE:",
-          response.data
+          "API RESPONSE for quizz:",
+          response
         );
 
         setQuizData(response.data);
@@ -221,7 +221,7 @@ function Quizzes() {
   // ==========================================
 
   return (
-    <div className="p-6 space-y-6 bg-gray-100 min-h-screen">
+    <div className="p-6 space-y-6  min-h-screen">
 
       {showForm ? (
 

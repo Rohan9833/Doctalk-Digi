@@ -12,15 +12,7 @@ function QuizFilters({
   setStatus,
   setPage,
 }) {
-  // ==============================
-  // LOCAL SEARCH INPUT
-  // ==============================
-
   const [searchInput, setSearchInput] = useState(search || "");
-
-  // ==============================
-  // DEBOUNCE
-  // ==============================
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -28,29 +20,16 @@ function QuizFilters({
 
       setSearch(searchInput.trim());
       setPage(1);
-    }, 5000);
+    }, 500);
 
     return () => {
       clearTimeout(timer);
     };
   }, [searchInput, setSearch, setPage]);
 
-  // ==============================
-  // DROPDOWN DATA
-  // ==============================
-
-  const therapyAreas =
-    data?.therapyAreaForDropdown || [];
-
-  const clients =
-    data?.clientForDropdown || [];
-
-  const statuses =
-    data?.statusForDropdown || [];
-
-  // ==============================
-  // RESET
-  // ==============================
+  const therapyAreas = data?.therapyAreaForDropdown || [];
+  const clients = data?.clientForDropdown || [];
+  const statuses = data?.statusForDropdown || [];
 
   const resetFilters = () => {
     setSearchInput("");
@@ -69,34 +48,30 @@ function QuizFilters({
     client !== "All" ||
     status !== "All";
 
-  // ==============================
-  // UI
-  // ==============================
-
   return (
-    <div className="mb-5">
-      <div className="flex flex-wrap gap-3">
+    <div className="mb-5 w-full">
+      <div className="flex items-center gap-2">
 
         {/* ================= SEARCH ================= */}
 
         <input
           type="text"
-          placeholder="Search quizzes..."
+          placeholder="Search..."
           value={searchInput}
           onChange={(e) => {
             setSearchInput(e.target.value);
           }}
           className="
-            w-[300px]
-            h-12
-            px-4
+            w-[155px]
+            h-[32px]
+            px-2.5
             border
             border-gray-300
-            rounded-xl
+            rounded-md
             bg-white
             outline-none
             focus:border-indigo-500
-            text-sm
+            text-[11px]
           "
         />
 
@@ -109,26 +84,23 @@ function QuizFilters({
             setPage(1);
           }}
           className="
-            h-12
-            px-4
+            w-[150px]
+            h-[32px]
+            px-2
             border
             border-gray-300
-            rounded-xl
+            rounded-md
             bg-white
             outline-none
-            text-sm
-            min-w-[190px]
+            text-[11px]
+            cursor-pointer
+            focus:border-indigo-500
           "
         >
-          <option value="All">
-            Therapy Area: All
-          </option>
+          <option value="All">Therapy: All</option>
 
           {therapyAreas.map((item) => (
-            <option
-              key={item._id}
-              value={item._id}
-            >
+            <option key={item._id} value={item._id}>
               {item._id}
             </option>
           ))}
@@ -143,26 +115,23 @@ function QuizFilters({
             setPage(1);
           }}
           className="
-            h-12
-            px-4
+            w-[125px]
+            h-[32px]
+            px-2
             border
             border-gray-300
-            rounded-xl
+            rounded-md
             bg-white
             outline-none
-            text-sm
-            min-w-[160px]
+            text-[11px]
+            cursor-pointer
+            focus:border-indigo-500
           "
         >
-          <option value="All">
-            Client: All
-          </option>
+          <option value="All">Client: All</option>
 
           {clients.map((item) => (
-            <option
-              key={item._id}
-              value={item._id}
-            >
+            <option key={item._id} value={item._id}>
               {item._id}
             </option>
           ))}
@@ -177,26 +146,23 @@ function QuizFilters({
             setPage(1);
           }}
           className="
-            h-12
-            px-4
+            w-[115px]
+            h-[32px]
+            px-2
             border
             border-gray-300
-            rounded-xl
+            rounded-md
             bg-white
             outline-none
-            text-sm
-            min-w-[140px]
+            text-[11px]
+            cursor-pointer
+            focus:border-indigo-500
           "
         >
-          <option value="All">
-            Status: All
-          </option>
+          <option value="All">Status: All</option>
 
           {statuses.map((item) => (
-            <option
-              key={item._id}
-              value={item._id}
-            >
+            <option key={item._id} value={item._id}>
               {item._id}
             </option>
           ))}
@@ -207,18 +173,20 @@ function QuizFilters({
         <button
           onClick={resetFilters}
           className="
-            h-12
-            px-5
-            rounded-xl
+            w-[82px]
+            h-[32px]
+            px-2
+            rounded-md
             border
             border-indigo-300
             text-indigo-600
             hover:bg-indigo-50
-            text-sm
-            transition
+            text-[11px]
+            font-medium
+            whitespace-nowrap
           "
         >
-          {hasFilters ? "Reset Filters" : "Filters"}
+          {hasFilters ? "Reset" : "Filters"}
         </button>
 
       </div>
