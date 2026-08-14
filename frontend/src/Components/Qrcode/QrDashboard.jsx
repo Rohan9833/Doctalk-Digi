@@ -472,7 +472,7 @@ function QRCodeDashboard({
 
             {/* BULK */}
 
-            <button
+            {/* <button
               type="button"
               className="
                 flex
@@ -493,7 +493,7 @@ function QRCodeDashboard({
             >
               <Users size={16} />
               Bulk Generate QR
-            </button>
+            </button> */}
 
             {/* GENERATE */}
 

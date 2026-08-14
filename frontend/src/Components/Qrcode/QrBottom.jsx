@@ -11,6 +11,7 @@ import {
   ChevronRight,
   QrCode,
   X,
+  BarChart3,
 } from "lucide-react";
 
 function QRCodeTable({
@@ -30,6 +31,12 @@ function QRCodeTable({
   // ==========================================
 
   onEditQR,
+
+  // ==========================================
+  // EXPORT EXCEL API FROM PARENT
+  // ==========================================
+
+  onExportExcel,
 }) {
   // ==========================================
   // SEARCH
@@ -397,6 +404,7 @@ function QRCodeTable({
               <div className="flex shrink-0 items-center gap-2">
                 <button
                   type="button"
+                  onClick={onExportExcel}
                   className="
                     flex
                     items-center
@@ -845,15 +853,15 @@ function QRCodeTable({
           <div className="flex flex-col gap-3">
             {/* QUICK ACTIONS */}
 
-            <div
+            {/* <div
               className="
-                rounded-lg
-                border
-                border-gray-200
-                bg-white
-                p-3
-                shadow-[0_2px_8px_rgba(0,0,0,0.03)]
-              "
+    rounded-lg
+    border
+    border-gray-200
+    bg-white
+    p-3
+    shadow-[0_2px_8px_rgba(0,0,0,0.03)]
+  "
             >
               <h2 className="text-[13px] font-semibold text-[#17203a]">
                 Quick Actions
@@ -863,16 +871,16 @@ function QRCodeTable({
                 <button className="flex w-full items-center gap-2 text-left">
                   <div
                     className="
-                      flex
-                      h-[32px]
-                      w-[32px]
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-lg
-                      bg-purple-50
-                      text-purple-600
-                    "
+          flex
+          h-[32px]
+          w-[32px]
+          shrink-0
+          items-center
+          justify-center
+          rounded-lg
+          bg-purple-50
+          text-purple-600
+        "
                   >
                     <QrCode size={16} />
                   </div>
@@ -891,44 +899,16 @@ function QRCodeTable({
                 <button className="flex w-full items-center gap-2 text-left">
                   <div
                     className="
-                      flex
-                      h-[32px]
-                      w-[32px]
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-lg
-                      bg-purple-50
-                      text-purple-600
-                    "
-                  >
-                    <Users size={16} />
-                  </div>
-
-                  <div>
-                    <p className="text-[10px] font-semibold text-gray-700">
-                      Bulk Generate QR
-                    </p>
-
-                    <p className="mt-0.5 text-[9px] text-gray-400">
-                      Generate QR for multiple doctors
-                    </p>
-                  </div>
-                </button>
-
-                <button className="flex w-full items-center gap-2 text-left">
-                  <div
-                    className="
-                      flex
-                      h-[32px]
-                      w-[32px]
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-lg
-                      bg-purple-50
-                      text-purple-600
-                    "
+          flex
+          h-[32px]
+          w-[32px]
+          shrink-0
+          items-center
+          justify-center
+          rounded-lg
+          bg-purple-50
+          text-purple-600
+        "
                   >
                     <Download size={16} />
                   </div>
@@ -947,34 +927,33 @@ function QRCodeTable({
                 <button className="flex w-full items-center gap-2 text-left">
                   <div
                     className="
-                      flex
-                      h-[32px]
-                      w-[32px]
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-lg
-                      bg-purple-50
-                      text-purple-600
-                    "
+          flex
+          h-[32px]
+          w-[32px]
+          shrink-0
+          items-center
+          justify-center
+          rounded-lg
+          bg-purple-50
+          text-purple-600
+        "
                   >
                     <FileText size={16} />
                   </div>
 
                   <div>
                     <p className="text-[10px] font-semibold text-gray-700">
-                      QR Scan Report
+                      Export Doctor Data
                     </p>
 
                     <p className="mt-0.5 text-[9px] text-gray-400">
-                      View detailed scan analytics
+                      Export Doctor details to Excel
                     </p>
                   </div>
                 </button>
               </div>
-            </div>
+            </div> */}
 
-            {/* QR HELP */}
 
             <div
               className="

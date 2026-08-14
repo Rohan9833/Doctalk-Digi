@@ -7,6 +7,8 @@ const {
   getAllQr,
   trackQrScan,
   updateQr,
+  exportQrExcel,
+  downloadAllQrZip,
 } = require("../Controller/Qrcodecontroller.js");
 
 // Admin route
@@ -15,6 +17,8 @@ router.get("/qr-scans-over-time", getQRScansOverTime);
 router.post("/create", createQr);
 router.get("/", getAllQr);
 router.post("/qrscan/:shortCode", trackQrScan);
-router.get("/edit", updateQr);
+router.put("/edit/:qrId", updateQr);
+router.get("/export-excel", exportQrExcel);
+router.get("/download-all", downloadAllQrZip);
 
 module.exports = router;

@@ -26,6 +26,7 @@ const qrScanSchema = new mongoose.Schema(
     },
 
     // ── Session link ──────────────────────────────────────
+
     // If patient goes on to start quiz, we link the attempt
     quizAttempt: {
       type: mongoose.Schema.Types.ObjectId,
@@ -40,6 +41,7 @@ const qrScanSchema = new mongoose.Schema(
     },
 
     // ── Location ──────────────────────────────────────────
+
     city: {
       type: String,
       trim: true,
@@ -58,7 +60,17 @@ const qrScanSchema = new mongoose.Schema(
       default: null,
     },
 
+    // ── Unique Scan ───────────────────────────────────────
+
+    // true  = first/unique scan
+    // false = repeat scan
+    uniqueScan: {
+      type: Boolean,
+      default: false,
+    },
+
     // ── Device ────────────────────────────────────────────
+
     deviceType: {
       type: String,
       enum: ["mobile", "desktop", "tablet", "unknown"],
@@ -71,6 +83,7 @@ const qrScanSchema = new mongoose.Schema(
     },
 
     // ── Conversion ────────────────────────────────────────
+
     // Did this scan lead to a quiz attempt?
     converted: {
       type: Boolean,
@@ -78,6 +91,7 @@ const qrScanSchema = new mongoose.Schema(
     },
 
     // ── Scan Time ─────────────────────────────────────────
+
     scannedAt: {
       type: Date,
       default: Date.now,
@@ -91,6 +105,7 @@ const qrScanSchema = new mongoose.Schema(
 // ── Indexes ───────────────────────────────────────────────
 
 // Existing indexes - KEEPING THEM
+
 qrScanSchema.index({
   doctor: 1,
   scannedAt: -1,
@@ -111,15 +126,24 @@ qrScanSchema.index({
 });
 
 // NEW: QR-specific analytics index
+
 qrScanSchema.index({
   qr: 1,
   scannedAt: -1,
 });
 
 // Optional: useful for unique-scan queries
+
 qrScanSchema.index({
   qr: 1,
   sessionId: 1,
+});
+
+// Useful for filtering unique scans
+
+qrScanSchema.index({
+  uniqueScan: 1,
+  scannedAt: -1,
 });
 
 module.exports =
